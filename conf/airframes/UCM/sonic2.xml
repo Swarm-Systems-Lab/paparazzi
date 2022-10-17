@@ -24,9 +24,9 @@
 
     <define name="USE_GYRO_PITCH_RATE"/>
     
-    <!--target name="ap" board="apogee_1.0_chibios">
+    <target name="ap" board="apogee_1.0_chibios">
       <module name="radio_control" type="sbus"/>
-    </target-->
+    </target>
     <target name="nps" board="pc">
       <module name="radio_control" type="ppm"/>
       <module name="fdm" type="jsbsim"/>
@@ -44,11 +44,15 @@
     <module name="control" type="new"/>
     <module name="navigation"/>
     <module name="tlsf"/>
-
+    
     <module name="gps" type="ublox">
-      <configure name="GPS_BAUD" value="B38400"/>
+      <configure name="GPS_BAUD" value="B115200"/>
+      <define name="GPS_UBX_BOOTRESET" value="3"/>
     </module>
-
+    
+    <module name="gps_ubx_ucenter">
+      <define name="DEBUG_GPS_UBX_CENTER" value="TRUE"/>
+    </module>
   </firmware>
 
   <servos>
@@ -259,7 +263,7 @@
   </section>
 
   <section name="SIMULATOR" prefix="NPS_">
-    <define name="JSBSIM_LAUNCHSPEED" value="15"/>
+    <define name="JSBSIM_LAUNCHSPEED" value="10"/>
     <define name="JSBSIM_MODEL" value="easystar" type="string"/>
     <define name="SENSORS_PARAMS" value="nps_sensors_params_default.h" type="string"/>
   </section>
