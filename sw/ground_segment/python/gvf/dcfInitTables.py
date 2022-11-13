@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#!/usr/bin/env python
 #
 # Copyright (C) 2017 Hector Garcia de Marina <hgdemarina@gmail.com>
 #                    Gautier Hattenberger <gautier.hattenberger@enac.fr>
@@ -42,7 +41,7 @@ class initTable:
         self.config = config
         self.ids = np.array(self.config['ids'])
         self.B = np.array(self.config['topology'])
-        self.Zdesired = np.array(self.config['desired_intervehicle_angles'])
+        self.Zdesired = np.array(self.config['desired_intervehicle_angles_degrees'])
         self.list_ids = np.ndarray.tolist(self.ids)
 
         # Start IVY interface
