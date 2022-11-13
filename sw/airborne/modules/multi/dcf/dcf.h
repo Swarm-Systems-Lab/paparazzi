@@ -34,6 +34,18 @@
 #define DCF_MAX_NEIGHBORS 4
 #endif
 
+#ifdef FIXEDWING_FIRMWARE
+#include "modules/nav/common_nav.h"
+#define DCF_AUTO2 AP_MODE_AUTO2
+
+#elif defined(ROVER_FIRMWARE)
+#include "firmwares/rover/navigation.h"
+#define DCF_AUTO2 MODE_AUTO2
+
+#else
+#error "DCF does not support your firmware yet!"
+#endif
+
 struct dcf_con {
   float k;
   float radius;

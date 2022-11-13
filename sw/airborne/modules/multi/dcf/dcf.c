@@ -22,10 +22,9 @@
 #include <math.h>
 #include <std.h>
 
-#include "modules/muti/dcf/dcf.h"
+#include "dcf.h"
 //#include "modules/datalink/datalink.h" // dl_buffer
 #include "modules/datalink/telemetry.h"
-#include "modules/nav/common_nav.h"
 #include "autopilot.h"
 #include "std.h"
 
@@ -74,8 +73,8 @@ void dcf_init(void)
 
 bool distributed_circular(uint8_t wp)
 {
-  float xc = waypoints[wp].x;
-  float yc = waypoints[wp].y;
+  float xc = WaypointX(wp);
+  float yc = WaypointY(wp);
   struct EnuCoor_f *p = stateGetPositionEnu_f();
   float x = p->x;
   float y = p->y;
@@ -114,7 +113,7 @@ bool distributed_circular(uint8_t wp)
 
   gvf_ellipse_XY(xc, yc, dcf_control.radius + u, dcf_control.radius + u, 0);
 
-  if ((now - last_transmision > dcf_control.broadtime) && (autopilot_get_mode() == AP_MODE_AUTO2)) {
+  if ((now - last_transmision > dcf_control.broadtime) && (autopilot_get_mode() == DCF_AUTO2)) {
     send_theta_to_nei();
     last_transmision = now;
   }

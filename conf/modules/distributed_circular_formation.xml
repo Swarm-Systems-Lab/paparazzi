@@ -43,6 +43,10 @@
   <makefile firmware="fixedwing">
     <file name="dcf.c"/>
   </makefile>
+  
+  <makefile firmware="rover">
+    <file name="dcf.c"/>
+  </makefile>
 
 </module>
 
