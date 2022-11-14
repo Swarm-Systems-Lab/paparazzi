@@ -64,7 +64,7 @@ class Proxy:
         self.gcs_id = int(gcs_conf[0])
         self.gcs_addr = gcs_conf[1]
         self.gcs = pprzlink.udp.UdpMessagesInterface(self.proccess_gcs_msg, False,
-                int(gcs_conf[3]), int(gcs_conf[2]), 'datalink') # crossing ports here
+                int(gcs_conf[3]), int(gcs_conf[2]), 'datalink', None) # crossing ports here
         self.acs = []
         for ac in ac_conf:
             self.acs.append((int(ac[0]), ac[1],
@@ -75,8 +75,11 @@ class Proxy:
     def proccess_mav_msg(self, sender, address, msg, length, receiver_id=None, component_id=None):
         if receiver_id is None:
             return
+        elif str(msg).find("AUTOPILOT_VERSION") > 0:
+        	return
         if self.verbose:
             print("new message from %i (%s) [%d Bytes]: %s" % (sender, address, length, msg))
+        
         if receiver_id == self.gcs_id:
             # normal telemetry message for the GCS
             if self.verbose:
