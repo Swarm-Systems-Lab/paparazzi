@@ -34,41 +34,48 @@
 #include "modules/core/abi.h"
 #include "mcu_periph/gpio_arch.h"
 
-
 /* Local functions */
-static void invensense3_parse_data(struct invensense3_t *inv, volatile uint8_t *data, uint16_t len);
+static void invensense3_parse_fifo_data(struct invensense3_t *inv, volatile uint8_t *data, uint16_t samples);
+static void invensense3_parse_reg_data(struct invensense3_t *inv, volatile uint8_t *data);
 static void invensense3_fix_config(struct invensense3_t *inv);
 static bool invensense3_register_write(struct invensense3_t *inv, uint16_t bank_reg, uint8_t value);
 static bool invensense3_register_read(struct invensense3_t *inv, uint16_t bank_reg, uint16_t size);
 static bool invensense3_select_bank(struct invensense3_t *inv, uint8_t bank);
 static bool invensense3_config(struct invensense3_t *inv);
+static bool invensense3_reset_fifo(struct invensense3_t *inv);
 
 /* Default gyro scalings */
-static const struct Int32Rates invensense3_gyro_scale[5][2] = {
-  { {30267, 30267, 30267},
-    {55463, 55463, 55463} }, // 250DPS
-  { {60534, 60534, 60534},
-    {55463, 55463, 55463} }, // 500DPS
-  { {40147, 40147, 40147},
-    {18420, 18420, 18420} }, // 1000DPS
-  { {40147, 40147, 40147},
-    {9210,  9210,  9210} },  // 2000DPS
-  { {40147, 40147, 40147},
-    {4605,  4605,  4605} }   // 4000DPS
+static const struct Int32Rates invensense3_gyro_scale[8][2] = {
+  { {40147,    40147,    40147},
+    {9210,     9210,     9210} },     // 2000DPS
+  { {40147,    40147,    40147},
+    {18420,    18420,    18420} },    // 1000DPS
+  { {60534,    60534,    60534},
+    {55463,    55463,    55463} },    // 500DPS
+  { {30267,    30267,    30267},
+    {55463,    55463,    55463} },    // 250DPS 
+  { {30267,    30267,    30267},
+    {110926,   110926,   110926} },   // 125DPS   vvv (TODO: the new scales are not tested yet) vvv
+  { {3292054,  3292054,  3292054},
+    {24144015, 24144015, 24144015} }, // 62.5DPS
+  { {1646027,  1646027,  1646027},
+    {24144015, 24144015, 24144015} }, // 31.25DPS
+  { {1646027,  1646027,  1646027},
+    {48288030, 48288030, 48288030} }, // 15.625DPS
 };
 
 /* Default accel scalings */
 static const struct Int32Vect3 invensense3_accel_scale[5][2] = {
-  { {3189, 3189, 3189},
-    {5203, 5203, 5203} },   // 2G
-  { {6378, 6378, 6378},
-    {5203, 5203, 5203} },   // 4G
-  { {12756, 12756, 12756},
-    {5203,  5203,  5203} }, // 8G
+  { {51024, 51024, 51024},
+    {5203,  5203,  5203} }, // 32G
   { {25512, 25512, 25512},
     {5203,  5203,  5203} }, // 16G
-  { {51024, 51024, 51024},
-    {5203,  5203,  5203} }  // 30G
+  { {12756, 12756, 12756},
+    {5203,  5203,  5203} }, // 8G
+  { {6378, 6378, 6378},
+    {5203, 5203, 5203} },   // 4G
+  { {3189, 3189, 3189},
+    {5203, 5203, 5203} }    // 2G
 };
 
 /* AAF settings (3dB Bandwidth [Hz], AAF_DELT, AAF_DELTSQR, AAF_BITSHIFT) */
@@ -204,6 +211,8 @@ static const uint16_t invensense3_aaf4x605[][4] = {
   {995, 63, 3968, 3}
 };
 
+static const uint8_t invensense3_fifo_sample_size[4] = {8,8,16,20};
+
 /**
  * @brief Initialize the invensense v3 sensor instance
  * 
@@ -215,7 +224,7 @@ void invensense3_init(struct invensense3_t *inv) {
   inv->device = INVENSENSE3_UNKOWN;
   inv->register_bank = 0xFF;
   inv->config_idx = 0;
-
+  
   /* SPI setup */
   if(inv->bus == INVENSENSE3_SPI) {
     inv->spi.trans.cpol = SPICpolIdleHigh;
@@ -239,6 +248,8 @@ void invensense3_init(struct invensense3_t *inv) {
     inv->i2c.trans.slave_addr = inv->i2c.slave_addr;
     inv->i2c.trans.status = I2CTransDone;
   }
+
+  inv->sample_size = INVENSENSE3_SAMPLE_SIZE_PK3;
 }
 
 /**
@@ -260,16 +271,27 @@ void invensense3_periodic(struct invensense3_t *inv) {
         /* Request WHO_AM_I */
         invensense3_register_read(inv, INV3REG_WHO_AM_I, 1);
         break;
+
       case INVENSENSE3_CONFIG:
         /* Start configuring */
         if(invensense3_config(inv)) {
           inv->status = INVENSENSE3_RUNNING;
         }
         break;
+
       case INVENSENSE3_RUNNING:
         /* Request a sensor reading */
-        invensense3_register_read(inv, INV3REG_FIFO_COUNTH, 2);
-        break;
+        switch (inv->parser) {
+          case INVENSENSE3_PARSER_REGISTERS:
+            invensense3_register_read(inv, INV3REG_TEMP_DATA1, 14);
+            break;
+          case INVENSENSE3_PARSER_FIFO:
+            invensense3_register_read(inv, INV3REG_FIFO_COUNTH, 2);
+            break;
+          default: break;
+        }
+      
+      default: break;
     }
   }
 }
@@ -335,45 +357,71 @@ void invensense3_event(struct invensense3_t *inv) {
         if(inv->status == INVENSENSE3_CONFIG)
           invensense3_fix_config(inv);
         break;
+
       case INVENSENSE3_CONFIG:
         /* Apply the next configuration register */
         if(invensense3_config(inv)) {
           inv->status = INVENSENSE3_RUNNING;
         }
         break;
-      case INVENSENSE3_RUNNING: {
-        /* Parse the results */
-        static const uint16_t max_bytes = sizeof(inv->spi.rx_buf) - 3;
-        uint16_t fifo_bytes = (uint16_t)rx_buffer[1] << 8 | rx_buffer[2];
 
-        // We read an incorrect length (try again)
-        if(fifo_bytes > 4096) {
-          invensense3_register_read(inv, INV3REG_FIFO_COUNTH, 2);
-          return;
-        }
+      // TODO: Maybe we could add a new state (if INVENSENSE3_PARSER_FIFO) to check INT_STATUS and wait for FIFO_FULL or FIFO_WM interruption??
 
-        // Parse the data
-        if((rx_length - 3) > 0) {
-          uint16_t valid_bytes = ((rx_length - 3) < fifo_bytes)? (rx_length - 3) : fifo_bytes;
-          invensense3_parse_data(inv, &rx_buffer[3], valid_bytes);
-          inv->timer -= valid_bytes;
-        } else {
-          fifo_bytes -= fifo_bytes%INVENSENSE3_SAMPLE_SIZE;
-          inv->timer = fifo_bytes;
-        }
+      case INVENSENSE3_RUNNING:
+        /* Select the desired parser */
+        switch (inv->parser) {
+          case INVENSENSE3_PARSER_REGISTERS:
+            invensense3_parse_reg_data(inv, &rx_buffer[1]);
+            break;
 
-        // If we have more data request more
-        if(inv->timer > 0) {
-          uint16_t read_bytes = (inv->timer > max_bytes)? max_bytes : inv->timer;
-          invensense3_register_read(inv, INV3REG_FIFO_COUNTH, 2 + read_bytes);
+          case INVENSENSE3_PARSER_FIFO: {
+            /* Parse the results */
+            static const uint16_t max_bytes = sizeof(inv->spi.rx_buf) - 3;
+            uint16_t n_samples = (uint16_t)rx_buffer[1] << 8 | rx_buffer[2];
+            uint16_t fifo_bytes = n_samples * invensense3_fifo_sample_size[inv->sample_size];
+
+            // Not enough data in FIFO
+            if(n_samples == 0) { // TODO: The FIFO is always empty. Should we fix something in the IMU config?
+              return;
+            }
+
+            // We read an incorrect length (try again)
+            if(fifo_bytes > 4096) {
+              invensense3_register_read(inv, INV3REG_FIFO_COUNTH, 2);
+              return;
+            }
+
+            // Parse the data
+            if((rx_length - 3) > 0) {
+              uint16_t valid_bytes = ((rx_length - 3) < fifo_bytes)? (rx_length - 3) : fifo_bytes;
+              invensense3_parse_fifo_data(inv, &rx_buffer[3], n_samples);
+              inv->timer -= valid_bytes;
+            } else {
+              fifo_bytes -= fifo_bytes%invensense3_fifo_sample_size[inv->sample_size];
+              inv->timer = fifo_bytes;
+            }
+
+            // If we have more data request more
+            if(inv->timer > 0) {
+              uint16_t read_bytes = (inv->timer > max_bytes)? max_bytes : inv->timer;
+              invensense3_register_read(inv, INV3REG_FIFO_COUNTH, 2 + read_bytes);
+            }
+
+            break;
+          }
+          default: break;
         }
         break;
-      }
+
+      default:
+        inv->status = INVENSENSE3_IDLE;
+        break;
     }
   }
+  
   /* Failed transaction */
   if((inv->bus == INVENSENSE3_SPI && inv->spi.trans.status == SPITransFailed) || 
-     (inv->bus == INVENSENSE3_I2C && inv->i2c.trans.status == I2CTransFailed)) {
+    (inv->bus == INVENSENSE3_I2C && inv->i2c.trans.status == I2CTransFailed)) {
 
     /* Set the transaction as done and update register bank if needed */
     if(inv->bus == INVENSENSE3_SPI) {
@@ -397,8 +445,9 @@ void invensense3_event(struct invensense3_t *inv) {
         }
         break;
       case INVENSENSE3_IDLE:
-      case INVENSENSE3_RUNNING:
+      case INVENSENSE3_RUNNING: 
         /* Ignore while idle/running */
+      default:
         break;
     }
   }
@@ -411,48 +460,100 @@ void invensense3_event(struct invensense3_t *inv) {
  * @param data The FIFO buffer data to parse
  * @param len The length of the FIFO buffer
  */
-static void invensense3_parse_data(struct invensense3_t *inv, volatile uint8_t *data, uint16_t len) {
-  uint8_t samples = len  / INVENSENSE3_SAMPLE_SIZE;
-  static struct Int32Vect3 accel[INVENSENSE3_SAMPLE_CNT] = {0};
-  static struct Int32Rates gyro[INVENSENSE3_SAMPLE_CNT] = {0};
+static void invensense3_parse_fifo_data(struct invensense3_t *inv, volatile uint8_t *data, uint16_t samples) { //TODO: test changes
+  static struct Int32Vect3 accel[INVENSENSE3_FIFO_BUFFER_LEN] = {0};
+  static struct Int32Rates gyro[INVENSENSE3_FIFO_BUFFER_LEN] = {0};
 
-  if(samples > INVENSENSE3_SAMPLE_CNT)
-    samples = INVENSENSE3_SAMPLE_CNT;
+  if(samples > INVENSENSE3_FIFO_BUFFER_LEN)
+    samples = INVENSENSE3_FIFO_BUFFER_LEN;
 
-  uint16_t gyro_samplerate = 9000;
-  if(inv->gyro_dlpf != INVENSENSE3_GYRO_DLPF_OFF)
-    gyro_samplerate = 1125;
+  uint8_t gyro_samplerate  = 17 - inv->gyro_odr;
+  uint8_t accel_samplerate = 17 - inv->accel_odr;
 
-  uint16_t accel_samplerate = 4500;
-  if(inv->accel_dlpf != INVENSENSE3_ACCEL_DLPF_OFF)
-    accel_samplerate = 1125;
+  uint8_t faster_odr = gyro_samplerate;
+  if (accel_samplerate > gyro_samplerate)
+    faster_odr = accel_samplerate;
 
   // Go through the different samples
+  uint8_t i = 0;
   uint8_t j = 0;
-  uint8_t downsample = gyro_samplerate / accel_samplerate;
   int32_t temp = 0;
-  for(uint8_t i = 0; i < samples; i++) { 
-    if(i % downsample == 0) {
-      accel[j].x = (int16_t)((uint16_t)data[2] << 8 | data[3]);
-      accel[j].y = (int16_t)((uint16_t)data[0] << 8 | data[1]);
-      accel[j].z = -(int16_t)((uint16_t)data[4] << 8 | data[5]);
-      j++;
+  uint16_t gyro_samplerate_count;
+  uint16_t accel_samplerate_count;
+  for(uint8_t sample = 0; sample < samples; sample++) { 
+
+    if ((data[0] & 0xFC) != 0x68) {
+        // no or bad data
+    } else {
+      
+      gyro_samplerate_count = gyro_samplerate * (sample + 1);
+      if(gyro_samplerate_count % faster_odr == 0) {
+        gyro[i].p =  (int16_t)((uint16_t)data[9] << 8 | data[10]);
+        gyro[i].q =  (int16_t)((uint16_t)data[7] << 8 | data[8]);
+        gyro[i].r = -(int16_t)((uint16_t)data[11] << 8 | data[12]);
+        
+        // Temperature sensor register data TEMP_DATA is updated with new data at max(Accelerometer ODR, Gyroscope ODR)
+        if(gyro_samplerate == faster_odr)
+          temp += (int16_t)((uint16_t)0x0 << 8 | data[13]);
+        
+        i++;
+      }
+
+      accel_samplerate_count = accel_samplerate * (sample + 1);
+      if(accel_samplerate_count % faster_odr == 0) {
+        accel[j].x =  (int16_t)((uint16_t)data[3] << 8 | data[4]);
+        accel[j].y =  (int16_t)((uint16_t)data[1] << 8 | data[2]);
+        accel[j].z = -(int16_t)((uint16_t)data[5] << 8 | data[6]);
+
+        if(accel_samplerate == faster_odr)
+          temp += (int16_t)((uint16_t)0x0 << 8 | data[13]);
+
+        j++;
+      }
     }
 
-    gyro[i].p = (int16_t)((uint16_t)data[8] << 8 | data[9]);
-    gyro[i].q = (int16_t)((uint16_t)data[6] << 8 | data[7]);
-    gyro[i].r = -(int16_t)((uint16_t)data[10] << 8 | data[11]);
-
-    temp += (int16_t)((uint16_t)data[12] << 8 | data[13]);
-    data += INVENSENSE3_SAMPLE_SIZE;
+      data += invensense3_fifo_sample_size[inv->sample_size];
   }
 
-  float temp_f = ((float)temp / samples) / 333.87f - 21.f;
+  // ADC temp * temp sensitivity + temp zero
+  float temp_f = ((float)temp / i) / 2.07 + 25.f; 
+  if (accel_samplerate == faster_odr)
+    temp_f = ((float)temp / j) / 2.07 + 25.f; 
 
   // Send the scaled values over ABI
   uint32_t now_ts = get_sys_time_usec();
-  AbiSendMsgIMU_GYRO_RAW(inv->abi_id, now_ts, gyro, samples);
+  AbiSendMsgIMU_GYRO_RAW(inv->abi_id, now_ts, gyro, i);
   AbiSendMsgIMU_ACCEL_RAW(inv->abi_id, now_ts, accel, j);
+  AbiSendMsgTEMPERATURE(inv->abi_id, temp_f);
+}
+
+/**
+ * @brief Parse data from registers
+ * 
+ * @param inv The invensense v3 instance
+ * @param data The data from all registers (DATA_TEMP, DATA_ACCEL and DATA_GYRO)
+ */
+static void invensense3_parse_reg_data(struct invensense3_t *inv, volatile uint8_t *data) {
+  static struct Int32Vect3 accel[1] = {0};
+  static struct Int32Rates gyro[1] = {0};
+
+  accel[0].x =  (int16_t)((uint16_t)data[5] << 8 | data[6]);
+  accel[0].y =  (int16_t)((uint16_t)data[3] << 8 | data[4]);
+  accel[0].z = -(int16_t)((uint16_t)data[7] << 8 | data[8]);
+
+  gyro[0].p =  (int16_t)((uint16_t)data[11] << 8 | data[12]);
+  gyro[0].q =  (int16_t)((uint16_t)data[9]  << 8 | data[10]);
+  gyro[0].r = -(int16_t)((uint16_t)data[13] << 8 | data[14]);
+  
+  int32_t temp = (int16_t)((uint16_t)data[0] << 8 | data[1]);
+
+  // ADC temp * temp sensitivity + temp zero
+  float temp_f = (float)temp / 132.48 + 25.f;
+
+  // Send the scaled values over ABI
+  uint32_t now_ts = get_sys_time_usec();
+  AbiSendMsgIMU_GYRO_RAW(inv->abi_id, now_ts, gyro, 1);
+  AbiSendMsgIMU_ACCEL_RAW(inv->abi_id, now_ts, accel, 1);
   AbiSendMsgTEMPERATURE(inv->abi_id, temp_f);
 }
 
@@ -485,6 +586,7 @@ static void invensense3_fix_config(struct invensense3_t *inv) {
 
   /* Fix the AAF bandwidth setting */
   const uint16_t (*aaf_table)[4];
+  uint16_t aaf_len;
   if(inv->device == INVENSENSE3_ICM40605 || inv->device == INVENSENSE3_ICM42605) {
     aaf_len = sizeof(invensense3_aaf4x605) / sizeof(invensense3_aaf4x605[0]);
     aaf_table = invensense3_aaf4x605;
@@ -498,25 +600,25 @@ static void invensense3_fix_config(struct invensense3_t *inv) {
   for(i = 0; i < aaf_len; i++) {
     if(inv->gyro_aaf <= aaf_table[i][0]) {
       inv->gyro_aaf = aaf_table[i][0];
-      inv->gyro_aaf_regs = aaf_table[i];
+      RMAT_COPY(inv->gyro_aaf_regs, aaf_table[i]);
       break;
     }
   }
   if(i >= (aaf_len-1)) {
     inv->gyro_aaf = aaf_table[aaf_len-1][0];
-    inv->gyro_aaf_regs = aaf_table[aaf_len-1];
+    RMAT_COPY(inv->gyro_aaf_regs, aaf_table[aaf_len-1]);
   }
 
   for(i = 0; i < aaf_len; i++) {
     if(inv->accel_aaf <= aaf_table[i][0]) {
       inv->accel_aaf = aaf_table[i][0];
-      inv->accel_aaf_regs = aaf_table[i];
+      RMAT_COPY(inv->accel_aaf_regs, aaf_table[i]);
       break;
     }
   }
   if(i >= (aaf_len-1)) {
     inv->accel_aaf = aaf_table[aaf_len-1][0];
-    inv->accel_aaf_regs = aaf_table[aaf_len-1];
+    RMAT_COPY(inv->accel_aaf_regs, aaf_table[aaf_len-1]);
   }
   
   /* Set the default values */
@@ -629,6 +731,18 @@ static bool invensense3_select_bank(struct invensense3_t *inv, uint8_t bank) {
 }
 
 /**
+ * @brief Reset FIFO (can be useful in some situations)
+ * 
+ * @param inv The invensense v3 instance
+ * @return true When reset is done
+ */
+static bool invensense3_reset_fifo(struct invensense3_t *inv) {
+  if(invensense3_register_write(inv, INV3REG_SIGNAL_PATH_RESET, BIT_SIGNAL_PATH_RESET_FIFO_FLUSH))
+    return true;
+  return false;
+}
+
+/**
  * @brief Configure the Invensense 3 device register by register
  * 
  * @param inv The invensense v3 instance
@@ -643,18 +757,19 @@ static bool invensense3_config(struct invensense3_t *inv) {
         inv->config_idx++;
       inv->timer = get_sys_time_usec();
       break;
-    case 1: {
+
+    case 1: 
       /* Because reset takes time wait ~5ms */
       if((get_sys_time_usec() - inv->timer) < 5e3)
         break;
 
       /* Start the accel en gyro in low noise mode */
-      if(register_write(INV3REG_PWR_MGMT0, (ACCEL_MODE_LN << ACCEL_MODE_SHIFT) | (GYRO_MODE_LN << GYRO_MODE_SHIFT)))
+      if(invensense3_register_write(inv, INV3REG_PWR_MGMT0, (ACCEL_MODE_LN << ACCEL_MODE_SHIFT) | (GYRO_MODE_LN << GYRO_MODE_SHIFT)))
         inv->config_idx++;
       inv->timer = get_sys_time_usec();
       break;
-    }
-    case 2: {
+
+    case 2: 
       /* Because starting takes time wait ~1ms */
       if((get_sys_time_usec() - inv->timer) < 1e3)
         break;
@@ -663,11 +778,11 @@ static bool invensense3_config(struct invensense3_t *inv) {
       if(invensense3_register_write(inv, INV3REG_GYRO_CONFIG0, (inv->gyro_range << GYRO_FS_SEL_SHIFT) | (inv->gyro_odr << GYRO_ODR_SHIFT)))
         inv->config_idx++;
       break;
-    }
+
     case 3: {
       /* Configure the accel ODR/FS */
       uint8_t accel_config = (inv->accel_odr << ACCEL_ODR_SHIFT);
-      if(inv->device == INVENSENSE3_ICM20649 && inv->gyro_range > 0)
+      if(inv->device == INVENSENSE3_ICM40609)
         accel_config |= inv->accel_range << ACCEL_FS_SEL_SHIFT;
       else
         accel_config |= (inv->accel_range - 1) << ACCEL_FS_SEL_SHIFT;
@@ -676,9 +791,10 @@ static bool invensense3_config(struct invensense3_t *inv) {
         inv->config_idx++;
       break;
     }
+
     case 4:
       /* Configure gyro AAF enable */
-      if(invensense3_register_write(inv, INV3REG_GYRO_CONFIG_STATIC2, 0x00))
+      if(invensense3_register_write(inv, INV3REG_GYRO_CONFIG_STATIC2, 0x11))
         inv->config_idx++;
       break;
     case 5:
@@ -708,36 +824,58 @@ static bool invensense3_config(struct invensense3_t *inv) {
       break;
     case 10:
       /* Configure accel AAF DELTSQR upper and bitshift */
-      if(invensense3_register_write(inv, INV3REG_ACCEL_CONFIG_STATIC5, (inv->accel_aaf_regs[3] << ACCEL_AAF_BITSHIFT_SHIFT) | ((inv->accel_aaf_regs[2]>>8) & 0x0F)))
+      if(invensense3_register_write(inv, INV3REG_ACCEL_CONFIG_STATIC4, (inv->accel_aaf_regs[3] << ACCEL_AAF_BITSHIFT_SHIFT) | ((inv->accel_aaf_regs[2]>>8) & 0x0F)))
         inv->config_idx++;
       break;
 
-
-    case 8:
-      /* FIFO reset 2 */
-      if(invensense3_register_write(inv, INV3REG_FIFO_RST, 0x00))
-        inv->config_idx++;
-      break;
-    case 9: {
-      /* Enable FIFO */
-      uint8_t user_ctrl = BIT_USER_CTRL_FIFO_EN;
-      if(inv->bus == INVENSENSE3_SPI)
-        user_ctrl |= BIT_USER_CTRL_I2C_IF_DIS;
-      if(invensense3_register_write(inv, INV3REG_USER_CTRL, user_ctrl))
-        inv->config_idx++;
-      break;
-    }
-    case 10:
-      /* Cofigure FIFO enable */
-      if(invensense3_register_write(inv, INV3REG_FIFO_EN_2, BIT_XG_FIFO_EN | BIT_YG_FIFO_EN |
-                    BIT_ZG_FIFO_EN | BIT_ACCEL_FIFO_EN | BIT_TEMP_FIFO_EN))
-        inv->config_idx++;
-      break;
     case 11:
-      /* Enable interrupt pin/status */
-      if(invensense3_register_write(inv, INV3REG_INT_ENABLE_1, 0x1))
+      /* FIFO count in records (little-endian data) */
+      if(invensense3_register_write(inv, INV3REG_INTF_CONFIG0, FIFO_COUNT_REC))
         inv->config_idx++;
       break;
+    case 12:
+      /* FIFO Stop-on-Full mode (enable the FIFO) */
+      if(invensense3_register_write(inv, INV3REG_FIFO_CONFIG , FIFO_CONFIG_MODE_STOP_ON_FULL))
+        inv->config_idx++;
+      break;
+    case 13:
+      /* FIFO content: enable accel, gyro, temperature */
+      if(invensense3_register_write(inv, INV3REG_FIFO_CONFIG1 , BIT_FIFO_CONFIG1_ACCEL_EN | 
+                    BIT_FIFO_CONFIG1_GYRO_EN | BIT_FIFO_CONFIG1_TEMP_EN))
+        inv->config_idx++;
+      break;
+    case 14:
+      /* Set FIFO watermark to 1 (so that INT is triggered for each packet) */
+      if(invensense3_register_write(inv, INV3REG_FIFO_CONFIG2, 0x1))
+        inv->config_idx++;
+      break;
+    case 15:
+      /* Enable interrupt pin/status */
+        switch(inv->parser) {
+          case INVENSENSE3_PARSER_REGISTERS:
+            if(invensense3_register_write(inv, INV3REG_INT_SOURCE0, BIT_UI_DRDY_INT_EN))
+              inv->config_idx++;
+            break;
+          case INVENSENSE3_PARSER_FIFO:
+            if(invensense3_register_write(inv, INV3REG_INT_SOURCE0, BIT_FIFO_FULL_INT_EN | BIT_FIFO_THS_INT_EN))
+              inv->config_idx++;
+            break;
+          default:
+            break;
+          }
+      break;
+    case 16:
+      /* Interrupt pins ASYNC_RESET configuration */
+      // Datasheet: "User should change setting to 0 from default setting of 1, for proper INT1 and INT2 pin operation"
+      if(invensense3_register_write(inv, INV3REG_INT_CONFIG1, BIT_INT_ASYNC_RESET))
+        inv->config_idx++;
+      break;
+    case 17:
+      /* FIFO flush */
+      if(invensense3_reset_fifo(inv))
+        inv->config_idx++;
+      break;
+
     default:
       inv->timer = 0;
       return true;

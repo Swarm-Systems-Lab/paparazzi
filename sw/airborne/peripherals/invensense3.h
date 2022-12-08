@@ -33,12 +33,12 @@
 #include "mcu_periph/spi.h"
 #include "mcu_periph/i2c.h"
 
-// Hold 22 measurements and 3 for the register address and length
-#define INVENSENSE3_SAMPLE_CNT    22
-#define INVENSENSE3_SAMPLE_SIZE   14
-#define INVENSENSE3_BUFFER_SIZE   ((INVENSENSE3_SAMPLE_SIZE*INVENSENSE3_SAMPLE_CNT) + 3)
+/* This sensor has an option to request little-endian data */
+// Hold 22 measurements + 3 for the register address and length
+#define INVENSENSE3_FIFO_BUFFER_LEN 22
+#define INVENSENSE3_BUFFER_SIZE INVENSENSE3_FIFO_BUFFER_LEN * 20 + 3 // 20 bytes is the maximum sample size
 
-/* Invensense v2 SPI peripheral */
+/* Invensense v3 SPI peripheral */
 struct invensense3_spi_t {
   struct spi_periph *p;                             ///< Peripheral device for communication
   uint8_t slave_idx;                                ///< Slave index used for Slave Select
@@ -48,27 +48,40 @@ struct invensense3_spi_t {
   volatile uint8_t rx_buf[INVENSENSE3_BUFFER_SIZE]; ///< Receive buffer
 };
 
-/* Invensense v2 I2C peripheral */
+/* Invensense v3 I2C peripheral */
 struct invensense3_i2c_t {
   struct i2c_periph *p;           ///< Peripheral device for communication
   uint8_t slave_addr;             ///< The I2C slave address on the bus
   struct i2c_transaction trans;   ///< TRansaction used during configuration and measurements
 };
 
-/* Possible communication busses for the invense V2 driver */
+/* Possible communication busses for the invense V3 driver */
 enum invensense3_bus_t {
   INVENSENSE3_SPI,
   INVENSENSE3_I2C
 };
 
-/* Different states the invensense driver can be in */
+/* Different states the invensense v3 driver can be in */
 enum invensense3_status_t {
   INVENSENSE3_IDLE,
   INVENSENSE3_CONFIG,
   INVENSENSE3_RUNNING
 };
 
-/* Different device types compatible with the invensense V2 driver */
+/* Different parsers of the invensense v3 driver */
+enum invensense3_parser_t {
+  INVENSENSE3_PARSER_REGISTERS,
+  INVENSENSE3_PARSER_FIFO       ///< TODO: The FIFO parser doesn't work yet
+};
+
+enum invensense3_fifo_packet_t {
+  INVENSENSE3_SAMPLE_SIZE_PK1,
+  INVENSENSE3_SAMPLE_SIZE_PK2,
+  INVENSENSE3_SAMPLE_SIZE_PK3,
+  INVENSENSE3_SAMPLE_SIZE_PK4
+};
+
+/* Different device types compatible with the invensense v3 driver */
 enum invensense3_device_t {
   INVENSENSE3_UNKOWN,
   INVENSENSE3_ICM40605,
@@ -80,8 +93,8 @@ enum invensense3_device_t {
 
 /* The gyro output data rate configuration */
 enum invensense3_gyro_odr_t {
-  INVENSENSE3_GYRO_ODR_32KHZ = 1,
-  INVENSENSE3_GYRO_ODR_16KHZ,
+  INVENSENSE3_GYRO_ODR_32KHZ = 1, ///< Not possible for ICM40605 and ICM42605
+  INVENSENSE3_GYRO_ODR_16KHZ,     ///< Not possible for ICM40605 and ICM42605
   INVENSENSE3_GYRO_ODR_8KHZ,
   INVENSENSE3_GYRO_ODR_4KHZ,
   INVENSENSE3_GYRO_ODR_2KHZ,
@@ -111,8 +124,8 @@ enum invensense3_gyro_range_t {
 
 /* The accelerometer output data rate configuration */
 enum invensense3_accel_odr_t {
-  INVENSENSE3_ACCEL_ODR_32KHZ = 1,
-  INVENSENSE3_ACCEL_ODR_16KHZ,
+  INVENSENSE3_ACCEL_ODR_32KHZ = 1,  ///< Not possible for ICM40605 and ICM42605
+  INVENSENSE3_ACCEL_ODR_16KHZ,      ///< Not possible for ICM40605 and ICM42605
   INVENSENSE3_ACCEL_ODR_8KHZ,
   INVENSENSE3_ACCEL_ODR_4KHZ,
   INVENSENSE3_ACCEL_ODR_2KHZ,
@@ -130,18 +143,19 @@ enum invensense3_accel_odr_t {
 
 /* The accelerometer range in G */
 enum invensense3_accel_range_t {
-  INVENSENSE3_ACCEL_RANGE_32G,
+  INVENSENSE3_ACCEL_RANGE_32G,       ///< Only possible for ICM40609
   INVENSENSE3_ACCEL_RANGE_16G,
   INVENSENSE3_ACCEL_RANGE_8G,
   INVENSENSE3_ACCEL_RANGE_4G,
   INVENSENSE3_ACCEL_RANGE_2G
 };
 
-/* Main invensense V2 device structure */
+/* Main invensense v3 device structure */
 struct invensense3_t {
   uint8_t abi_id;                     ///< The ABI id used to broadcast the device measurements
-  enum invensense3_status_t status;   ///< Status of the invensense V2 device
+  enum invensense3_status_t status;   ///< Status of the invensense v3 device
   enum invensense3_device_t device;   ///< The device type detected
+  enum invensense3_parser_t parser;   ///< Parser of the device
 
   enum invensense3_bus_t bus;         ///< The communication bus used to connect the device SPI/I2C
   union {
@@ -161,6 +175,7 @@ struct invensense3_t {
   enum invensense3_accel_range_t accel_range;   ///< Accelerometer range configuration
   uint16_t accel_aaf;                           ///< Accelerometer Anti-alias filter 3dB Bandwidth configuration [Hz]
   uint16_t accel_aaf_regs[4];                   ///< Accelerometer Anti-alias filter register values
+  enum invensense3_fifo_packet_t sample_size;   ///< FIFO packet size
 };
 
 /* External functions */

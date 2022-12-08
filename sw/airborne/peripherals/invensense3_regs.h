@@ -46,8 +46,9 @@
 #       define FIFO_CONFIG_MODE_STREAM_TO_FIFO              0x01
 #       define FIFO_CONFIG_MODE_STOP_ON_FULL                0x02
 #       define FIFO_CONFIG_MODE_SHIFT                       0x06
-#define INV3REG_FIFO_COUNTL           INV3REG(INV3_BANK0,0x2EU)
-#define INV3REG_FIFO_COUNTH           INV3REG(INV3_BANK0,0x2FU)
+#define INV3REG_INT_STATUS            INV3REG(INV3_BANK0,0x2DU)
+#define INV3REG_FIFO_COUNTH           INV3REG(INV3_BANK0,0x2EU)
+#define INV3REG_FIFO_COUNTL           INV3REG(INV3_BANK0,0x2FU)
 #define INV3REG_FIFO_DATA             INV3REG(INV3_BANK0,0x30U)
 #define INV3REG_SIGNAL_PATH_RESET     INV3REG(INV3_BANK0,0x4BU)
 #       define BIT_SIGNAL_PATH_RESET_FIFO_FLUSH             0x02
@@ -120,6 +121,8 @@
 #define INV3REG_GYRO_CONFIG1          INV3REG(INV3_BANK0,0x51U)
 #define INV3REG_GYRO_ACCEL_CONFIG0    INV3REG(INV3_BANK0,0x52U)
 #define INV3REG_ACCEL_CONFIG1         INV3REG(INV3_BANK0,0x53U)
+#define INV3REG_TMST_CONFIG           INV3REG(INV3_BANK0,0x54U)
+#       define BIT_TMST_CONFIG_TMST_EN                      0x01
 #define INV3REG_FIFO_CONFIG1          INV3REG(INV3_BANK0,0x5FU)
 #       define BIT_FIFO_CONFIG1_ACCEL_EN                    0x01
 #       define BIT_FIFO_CONFIG1_GYRO_EN                     0x02
@@ -130,6 +133,13 @@
 #       define BIT_FIFO_CONFIG1_RESUME_PARTIAL_RD           0x40
 #define INV3REG_FIFO_CONFIG2          INV3REG(INV3_BANK0,0x60U)
 #define INV3REG_FIFO_CONFIG3          INV3REG(INV3_BANK0,0x61U)
+#define INV3REG_INT_SOURCE0           INV3REG(INV3_BANK0,0x65U)
+#define INV3REG_INT_SOURCE3           INV3REG(INV3_BANK0,0x68U)
+#       define BIT_FIFO_FULL_INT_EN                        0x02
+#       define BIT_FIFO_THS_INT_EN                         0x04
+#       define BIT_UI_DRDY_INT_EN                          0x08
+#define INV3REG_INT_CONFIG1           INV3REG(INV3_BANK0,0x64U)
+#       define BIT_INT_ASYNC_RESET                          0x10
 #define INV3REG_WHO_AM_I              INV3REG(INV3_BANK0,0x75U)
 #define INV3REG_GYRO_CONFIG_STATIC2   INV3REG(INV3_BANK1,0x0BU)
 #       define BIT_GYRO_NF_DIS                              0x01
@@ -164,6 +174,8 @@
 #define INV3REG_ACCEL_CONFIG_STATIC4  INV3REG(INV3_BANK2,0x05U)
 #       define ACCEL_AAF_DELTSQR_HIGH_SHIFT                 0x00 //[11:8]
 #       define ACCEL_AAF_BITSHIFT_SHIFT                     0x04
+#define INV3REG_TEMP_DATA1                    INV3REG(INV3_BANK2,0x1DU)
+#define INV3REG_ACCEL_DATA_X1                 INV3REG(INV3_BANK2,0x1FU)
 
 #define INV3REG_BANK_SEL              0x76
 

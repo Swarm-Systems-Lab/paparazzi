@@ -1,0 +1,36 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="imu_icm42688" dir="imu" task="sensors">
+  <doc>
+    <description>
+      Driver module for the Invensense v3 IMU ICM42688. Tested with the Matek_f405_WMN autopilot.
+    </description>
+    <configure name="IMU_MPU_SPI_DEV" value="spi1" description="SPI device to use for ICM42688"/>
+    <configure name="IMU_MPU_SPI_SLAVE_IDX" value="SPI_SLAVE0" description="Slave index of the IMU AP_CS pin (12)"/>
+  </doc>
+  <dep>
+    <depends>i2c,spi_master,imu_common</depends>
+    <provides>imu</provides>
+  </dep>
+  <autoload name="imu_nps"/>
+  <autoload name="imu_sim"/>
+  <header>
+    <file name="imu_icm42688.h"/>
+  </header>
+  
+  <init fun="imu_icm42688_init()"/>
+  <periodic fun="imu_icm42688_periodic()" freq="1000"/>
+  <event fun="imu_icm42688_event()"/>
+  
+  <makefile target="!sim|nps|fbw">
+    <configure name="IMU_SPI_DEV" default="spi1" case="lower|upper"/>
+    <configure name="IMU_SPI_SLAVE_IDX" default="SPI_SLAVE0"/>
+    <define name="IMU_SPI_DEV" value="$(IMU_SPI_DEV_LOWER)"/>
+    <define name="USE_$(IMU_SPI_DEV_UPPER)"/>
+    <define name="IMU_SPI_SLAVE_IDX" value="$(IMU_SPI_SLAVE_IDX)"/>
+    <define name="USE_$(IMU_SPI_SLAVE_IDX)"/>
+
+    <file name="invensense3.c" dir="peripherals"/>
+    <file name="imu_icm42688.c"/>
+  </makefile>
+</module>
