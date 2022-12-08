@@ -794,7 +794,7 @@ static bool invensense3_config(struct invensense3_t *inv) {
 
     case 4:
       /* Configure gyro AAF enable */
-      if(invensense3_register_write(inv, INV3REG_GYRO_CONFIG_STATIC2, 0x11))
+      if(invensense3_register_write(inv, INV3REG_GYRO_CONFIG_STATIC2, 0x00))
         inv->config_idx++;
       break;
     case 5:
