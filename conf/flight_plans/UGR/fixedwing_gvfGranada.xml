@@ -43,7 +43,7 @@ static inline float wp_dist(float wp1_x, float wp1_y, float wp2_x, float wp2_y) 
     <module name="gvf_module">
       <define name="GVF_OCAML_GCS" value="FALSE"/>
     </module>
-    <module name="gvf_parametric"/> 
+    <!--module name="gvf_parametric"/--> 
   </modules>
   
   <blocks>

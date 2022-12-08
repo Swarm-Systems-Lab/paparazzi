@@ -1,0 +1,22 @@
+<!DOCTYPE module SYSTEM "../module.dtd">
+
+<module name="matek_f405_wmn" dir="boards">
+  <doc>
+    <description>
+      Specific configuration for Matek F405 WMN board.
+
+      Main board devices:
+      - IMU ICM42688-P (InvenSense V3) : needs a sensor to body calibration (inverse X and Z axes)
+      - Baro (SPL06-001)
+      - OSD (AT7456E) : desactivated for rovers.
+    
+      Example of use in the "gvf_cbf_steering_rove.xml" airframe file.
+    </description>
+  </doc>
+  <dep>
+    <depends>spi_master,current_sensor</depends>
+  </dep>
+  <makefile target="!sim|nps|fbw">
+  	<configure name="ADC_CURRENT_SENSOR" value="ADC_2"/>
+  </makefile>
+</module>

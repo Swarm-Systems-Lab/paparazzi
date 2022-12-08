@@ -70,6 +70,7 @@ Cargo.lock
 /conf/gps/ublox_conf
 !/conf/simulator/gazebo/**/*.config
 /conf/tools/blacklisted
+conf/airframes/UGR/multi
 
 # /doc/pprz_algebra/
 /doc/pprz_algebra/headfile.log
