@@ -1,0 +1,35 @@
+<conf>
+  <aircraft
+   name="gvf_rover_n1"
+   ac_id="1"
+   airframe="airframes/UGR/multi/gvf_cbf_steering_rover_n1.xml"
+   radio="radios/UCM/T16SZ_SBUS_rover.xml"
+   telemetry="telemetry/GVF/gvf_multi_rover.xml"
+   flight_plan="flight_plans/UGR/multi/multi_steering_rover_gvfMission.xml"
+   settings=""
+   settings_modules=""
+   gui_color="blue"
+  />
+  <aircraft
+   name="gvf_rover_n2"
+   ac_id="2"
+   airframe="airframes/UGR/multi/gvf_cbf_steering_rover_n2.xml"
+   radio="radios/UCM/T16SZ_SBUS_rover.xml"
+   telemetry="telemetry/GVF/gvf_multi_rover.xml"
+   flight_plan="flight_plans/UGR/multi/multi_steering_rover_gvfMission.xml"
+   settings=""
+   settings_modules=""
+   gui_color="red"
+  />
+  <aircraft
+   name="gvf_rover_n3"
+   ac_id="3"
+   airframe="airframes/UGR/multi/gvf_cbf_steering_rover_n3.xml"
+   radio="radios/UCM/T16SZ_SBUS_rover.xml"
+   telemetry="telemetry/GVF/gvf_multi_rover.xml"
+   flight_plan="flight_plans/UGR/multi/multi_steering_rover_gvfMission.xml"
+   settings=""
+   settings_modules=""
+   gui_color="green"
+  />
+</conf>

@@ -210,8 +210,8 @@
 // int32_t microvolts = ((uint32_t)adcGetChannel(ADC_CURRENT) * ADCVREF * 100) / 0xFFF * 10 - (int32_t)batteryMetersConfig()->current.offset * 100;
 // return microvolts / batteryMetersConfig()->current.scale; // current in 0.01A steps
 // return (uint64_t)adcGetChannel(ADC_BATTERY) * batteryMetersConfig()->voltage.scale * ADCVREF / (0xFFF * 1000);
-#define DefaultVoltageOfAdc(adc) (adc * ADCVREF * VSUPPLY_SCALE_DEFAULT / 0xFFF) //TODO: Fix it
-#define DefaultMilliAmpereOfAdc(adc) (adc * ADCVREF / CURRENT_METER_SCALE / 0xFFF) //TODO: Fix it
+#define DefaultVoltageOfAdc(adc) (adc * ADCVREF * VSUPPLY_SCALE_DEFAULT * 100 / 0xFFF) //TODO: Fix it
+#define DefaultMilliAmpereOfAdc(adc) (adc * ADCVREF / CURRENT_METER_SCALE * 100 / 0xFFF) //TODO: Fix it
 
 
 /*** PPM ***********************************************************************/
@@ -255,8 +255,8 @@
 #define PWM_SERVO_1_GPIO GPIOC
 #define PWM_SERVO_1_PIN GPIO9
 #define PWM_SERVO_1_AF GPIO_AF3
-#define PWM_SERVO_1_OC TIM_OC2
-#define PWM_SERVO_1_OC_BIT (1<<1)
+#define PWM_SERVO_1_OC TIM_OC4
+#define PWM_SERVO_1_OC_BIT (1<<3)
 #else
 #define PWM_SERVO_1_OC_BIT 0
 #endif
@@ -267,20 +267,20 @@
 #define PWM_SERVO_2_GPIO GPIOC
 #define PWM_SERVO_2_PIN GPIO8
 #define PWM_SERVO_2_AF GPIO_AF3
-#define PWM_SERVO_2_OC TIM_OC1
-#define PWM_SERVO_2_OC_BIT (1<<0)
+#define PWM_SERVO_2_OC TIM_OC3
+#define PWM_SERVO_2_OC_BIT (1<<2)
 #else
 #define PWM_SERVO_2_OC_BIT 0
 #endif
 
-#if USE_PWM3
+#if USE_PWM3 //TODO: Fix this port. 
 #define PWM_SERVO_3 2
 #define PWM_SERVO_3_TIMER TIM1
 #define PWM_SERVO_3_GPIO GPIOB
 #define PWM_SERVO_3_PIN GPIO15
 #define PWM_SERVO_3_AF GPIO_AF1
-#define PWM_SERVO_3_OC TIM_OC2
-#define PWM_SERVO_3_OC_BIT (1<<1)
+#define PWM_SERVO_3_OC TIM_OC3 // The TIM CHANNEL (3N) is not properly configured
+#define PWM_SERVO_3_OC_BIT (1<<2)
 #else
 #define PWM_SERVO_3_OC_BIT 0
 #endif
@@ -302,7 +302,7 @@
 #define PWM_SERVO_5_TIMER TIM2
 #define PWM_SERVO_5_GPIO GPIOB
 #define PWM_SERVO_5_PIN GPIO11
-#define PWM_SERVO_5_AF GPIO_AF3
+#define PWM_SERVO_5_AF GPIO_AF1
 #define PWM_SERVO_5_OC TIM_OC4
 #define PWM_SERVO_5_OC_BIT (1<<3)
 #else
@@ -314,7 +314,7 @@
 #define PWM_SERVO_6_TIMER TIM2
 #define PWM_SERVO_6_GPIO GPIOB
 #define PWM_SERVO_6_PIN GPIO10
-#define PWM_SERVO_6_AF GPIO_AF3
+#define PWM_SERVO_6_AF GPIO_AF1
 #define PWM_SERVO_6_OC TIM_OC3
 #define PWM_SERVO_6_OC_BIT (1<<2)
 #else
@@ -326,7 +326,7 @@
 #define PWM_SERVO_7_TIMER TIM2
 #define PWM_SERVO_7_GPIO GPIOB
 #define PWM_SERVO_7_PIN GPIO3
-#define PWM_SERVO_7_AF GPIO_AF9
+#define PWM_SERVO_7_AF GPIO_AF1
 #define PWM_SERVO_7_OC TIM_OC2
 #define PWM_SERVO_7_OC_BIT (1<<1)
 #else
@@ -338,7 +338,7 @@
 #define PWM_SERVO_8_TIMER TIM2
 #define PWM_SERVO_8_GPIO GPIOA
 #define PWM_SERVO_8_PIN GPIO15
-#define PWM_SERVO_8_AF GPIO_AF9
+#define PWM_SERVO_8_AF GPIO_AF1
 #define PWM_SERVO_8_OC TIM_OC1
 #define PWM_SERVO_8_OC_BIT (1<<0)
 #else

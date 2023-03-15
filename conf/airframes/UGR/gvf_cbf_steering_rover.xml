@@ -14,7 +14,7 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
     <target name="ap" board="matek_f405_wmn">
       <configure name="PERIODIC_FREQUENCY" value="100"/>
       <module name="radio_control" type="sbus">
-        <!--configure name="SBUS_PORT" value="UART6"/-->
+        <!--configure name="SBUS_PORT" value="UART2"/-->
       </module>
     </target>
     
@@ -31,7 +31,10 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
     <module name="actuators" type="pwm"/>
     <module name="telemetry" type="xbee_api"/>
 
-    <module name="gps" type="ublox"/>
+    <module name="gps" type="ublox">
+    	<configure name="GPS_BAUD" value="B57600"/>
+    	<configure name="GPS_PORT" value="UART4"/>
+    </module>
     <module name="gps_ubx_ucenter"/>
     <module name="imu" type="icm42688"/>
     <module name="ins"/>
@@ -62,9 +65,9 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
 
   <!-- COMMANDS SECTION ..................................................................... -->
   <servos> 
-    <!-- "no" 1 and 2 but no 0 because our board don't have S0 actuator entry... -->
-    <servo name="MOTOR_THROTTLE" no="1" min="1000" neutral="1500" max="2000"/>
-    <servo name="MOTOR_STEERING" no="2" min="1000" neutral="1500" max="2000"/>
+    <!-- "no" ... -->
+    <servo name="MOTOR_THROTTLE" no="0" min="1000" neutral="1500" max="2000"/>
+    <servo name="MOTOR_STEERING" no="3" min="1000" neutral="1500" max="2000"/>
   </servos> 
   
   <!-- Low level commands (PWM signal) -->
