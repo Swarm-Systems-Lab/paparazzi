@@ -107,7 +107,7 @@
       <field name="noise_y" type="float"/>
       <field name="noise_z" type="float"/>
     </message>
-    
+
     <message name="UWB_COMMUNICATION" id="19">
       <field name="id" type="uint8_t"/>
       <field name="range" type="float" unit="m"/>
@@ -190,7 +190,7 @@
     </message>
 
     <message name="JOYSTICK" id="28">
-      <!-- 
+      <!--
            This message can be used to send command inputs from a joystick or equivalent
            either for the control of the airframe or the control of the payload
       -->
@@ -215,12 +215,14 @@
       <field name="stamp" type="uint32_t" unit="us"/>
       <field name="gyro" type="struct Int32Rates *"/>
       <field name="samples" type="uint8_t"/>
+      <field name="temp" type="float" unit="deg Celcius"/>
     </message>
 
     <message name="IMU_ACCEL_RAW" id="32">
       <field name="stamp" type="uint32_t" unit="us"/>
       <field name="accel" type="struct Int32Vect3 *"/>
       <field name="samples" type="uint8_t"/>
+      <field name="temp" type="float" unit="deg Celcius"/>
     </message>
 
     <message name="IMU_MAG_RAW" id="33">
@@ -238,6 +240,10 @@
       <field name="stamp" type="uint32_t" unit="us"/>
       <field name="delta_accel" type="struct FloatVect3 *"/>
       <field name="dt" type="uint16_t" unit="us"/>
+    </message>
+
+    <message name="VEL_SP" id="36">
+      <field name="vel_sp" type="struct FloatVect3 *" unit="m/s"/>
     </message>
 
   </msg_class>

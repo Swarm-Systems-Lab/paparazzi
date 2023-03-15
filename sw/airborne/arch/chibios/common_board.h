@@ -82,7 +82,15 @@
 #endif
 
 /*
- * ADCs 
+ * IMU Heater
+ */
+#if defined(LINE_IMU_HEATER)
+#define IMU_HEATER_GPIO       PAL_PORT(LINE_IMU_HEATER)
+#define IMU_HEATER_GPIO_PIN   PAL_PAD(LINE_IMU_HEATER)
+#endif
+
+/*
+ * ADCs
  */
 #if defined(LINE_ADC1)
 #ifndef USE_ADC_1

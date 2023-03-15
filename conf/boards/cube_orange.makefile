@@ -69,12 +69,12 @@ MODEM_PORT ?= UART2
 MODEM_BAUD ?= B57600
 
 # The GPS1 port (UART8 is GPS2)
-GPS_PORT ?= UART1
+GPS_PORT ?= UART4
 GPS_BAUD ?= B57600
 
 # InterMCU port connected to the IO processor
 INTERMCU_PORT ?= UART6
-INTERMCU_BAUD ?= B230400
+INTERMCU_BAUD ?= B1500000
 
 #
 # default actuator configuration
