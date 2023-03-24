@@ -1,0 +1,63 @@
+<!DOCTYPE flight_plan SYSTEM "../flight_plan.dtd">
+
+<flight_plan alt="660" ground_alt="674" lat0="37.196197" lon0="-3.620459" max_dist_from_home="100" name="Rover Steering" security_height="0.3">
+  <header>
+
+</header>
+  <waypoints>
+    <waypoint name="HOME" x="-1.1" y="-8.2"/>
+    <waypoint name="STDBY" x="0" y="-4"/>
+    <waypoint name="ELLIPSE" x="4.3" y="-3.7"/>
+    <waypoint name="P1" x="-10.9" y="0.4"/>
+    <waypoint name="P2" x="9.8" y="-6.1"/>
+  </waypoints>
+  
+  <sectors/>
+  
+  <variables>
+    <variable init="5.0" max="20.0" min="1.0" step="1.0" var="a_stb"/>
+    <variable init="5.0" max="20.0" min="1.0" step="1.0" var="b_stb"/>
+  </variables>
+  
+  <blocks>
+    <block name="Wait GPS" strip_icon="gps.png">
+      <call_once fun="NavKillThrottle()"/>
+      <while cond="!GpsFixValid()"/>
+    </block>
+    
+    <block name="Geo init" strip_icon="googleearth.png">
+      <while cond="LessThan(NavBlockTime(), 10)"/>
+      <!--call_once fun="NavSetGroundReferenceHere()"/-->
+      <call_once fun="NavSetAltitudeReferenceHere()"/>
+    </block>
+    
+    <block name="Start Engine" strip_icon="on.png">
+      <while cond="LessThan(NavBlockTime(), 1)"/>
+      <call_once fun="autopilot_set_motors_on(TRUE)"/>
+    </block>
+    
+    <block name="Standby" strip_button="Standby" strip_icon="home.png">
+      <call fun="gvf_ellipse_wp(WP_STDBY, a_stb, b_stb, 0)"/>
+    </block>
+    
+    <block name="line_to_HOME" strip_icon="home_drop.png">
+      <call fun="gvf_segment_XY1_XY2(GetPosX(), GetPosY(), 0.f, 0.f)"/>
+    </block>
+    
+    <block name="ellipse_wp" strip_icon="oval.png">
+      <call fun="gvf_ellipse_wp(WP_ELLIPSE, gvf_ellipse_par.a, gvf_ellipse_par.b, gvf_ellipse_par.alpha)"/>
+    </block>
+    
+    <block name="line_P1_P2" strip_icon="line.png">
+      <call fun="gvf_line_wp1_wp2(WP_P1, WP_P2)"/>
+    </block>
+    
+    <block name="segment_turn_P1_P2" strip_icon="line.png">
+      <call fun="gvf_segment_loop_wp1_wp2(WP_P1, WP_P2, gvf_segment_par.d1, gvf_segment_par.d2)"/>
+    </block>
+    
+    <block name="sin_p1_p2" strip_icon="line_drop.png">
+      <call fun="gvf_sin_wp1_wp2(WP_P1, WP_P2, gvf_sin_par.w, gvf_sin_par.off, gvf_sin_par.A)"/>
+    </block>
+  </blocks>
+</flight_plan>
