@@ -12,8 +12,6 @@
     <depends>i2c,spi_master,imu_common</depends>
     <provides>imu</provides>
   </dep>
-  <autoload name="imu_nps"/>
-  <autoload name="imu_sim"/>
   <header>
     <file name="imu_icm42688.h"/>
   </header>

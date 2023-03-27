@@ -522,9 +522,8 @@ static void invensense3_parse_fifo_data(struct invensense3_t *inv, volatile uint
 
   // Send the scaled values over ABI
   uint32_t now_ts = get_sys_time_usec();
-  AbiSendMsgIMU_GYRO_RAW(inv->abi_id, now_ts, gyro, i);
-  AbiSendMsgIMU_ACCEL_RAW(inv->abi_id, now_ts, accel, j);
-  AbiSendMsgTEMPERATURE(inv->abi_id, temp_f);
+  AbiSendMsgIMU_GYRO_RAW(inv->abi_id, now_ts, gyro, i, temp_f);
+  AbiSendMsgIMU_ACCEL_RAW(inv->abi_id, now_ts, accel, j, temp_f);
 }
 
 /**
@@ -552,9 +551,8 @@ static void invensense3_parse_reg_data(struct invensense3_t *inv, volatile uint8
 
   // Send the scaled values over ABI
   uint32_t now_ts = get_sys_time_usec();
-  AbiSendMsgIMU_GYRO_RAW(inv->abi_id, now_ts, gyro, 1);
-  AbiSendMsgIMU_ACCEL_RAW(inv->abi_id, now_ts, accel, 1);
-  AbiSendMsgTEMPERATURE(inv->abi_id, temp_f);
+  AbiSendMsgIMU_GYRO_RAW(inv->abi_id, now_ts, gyro, 1, temp_f);
+  AbiSendMsgIMU_ACCEL_RAW(inv->abi_id, now_ts, accel, 1, temp_f);
 }
 
 /**
