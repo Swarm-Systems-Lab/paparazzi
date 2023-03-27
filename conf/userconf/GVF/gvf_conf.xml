@@ -29,7 +29,29 @@
    telemetry="telemetry/GVF/gvf_rover.xml"
    flight_plan="flight_plans/UCM/steering_rover_gvfMission.xml"
    settings=""
-   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ubx_ucenter.xml modules/guidance_rover_steering.xml modules/gvf_module.xml~GVF~ modules/imu_common.xml modules/nav_rover_base.xml"
+   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_rover_steering.xml~SR Guidance~ modules/gvf_module.xml~GVF~ modules/imu_common.xml modules/nav_rover_base.xml"
+   gui_color="blue"
+  />
+  <aircraft
+   name="gvf_cbf_steering_rover"
+   ac_id="3"
+   airframe="airframes/UGR/gvf_cbf_steering_rover3.xml"
+   radio="radios/UGR/FrSkyX20.xml"
+   telemetry="telemetry/GVF/gvf_rover.xml"
+   flight_plan="flight_plans/UGR/steering_rover_CBF_mission.xml"
+   settings=""
+   settings_modules="modules/ahrs_float_dcm.xml modules/distributed_circular_formation.xml~DCF~ modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_rover_steering.xml~SR Guidance~ modules/gvf_module.xml~GVF~ modules/imu_common.xml modules/nav_rover_base.xml"
+   gui_color="blue"
+  />
+  <aircraft
+   name="gvf_cbf_steering_rover_futaba"
+   ac_id="2"
+   airframe="airframes/UGR/gvf_cbf_steering_rover2.xml"
+   radio="radios/UGR/T16SZ_SBUS_rover.xml"
+   telemetry="telemetry/GVF/gvf_rover.xml"
+   flight_plan="flight_plans/UGR/steering_rover_CBF_mission.xml"
+   settings=""
+   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_rover_steering.xml~SR Guidance~ modules/gvf_module.xml~GVF~ modules/imu_common.xml modules/nav_rover_base.xml"
    gui_color="blue"
   />
 </conf>
