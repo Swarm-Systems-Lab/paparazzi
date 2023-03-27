@@ -1,0 +1,36 @@
+<!--
+(c) 2023 Jesús Bautista Villar <jesbauti20@gmail.com>
+
+This file is part of paparazzi.
+
+paparazzi is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+paparazzi is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with paparazzi; see the file COPYING.  If not, write to
+the Free Software Foundation, 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.
+-->
+
+<!DOCTYPE radio SYSTEM "../radio.dtd">
+<!--
+ FrSky X20 + FrSky ACCESS RX6R receiver
+ Channel values set by experiment!
+-->
+<radio name="FrSky X20 + FrSky ACCESS RX6R receiver" data_min="900" data_max="2100" sync_min="9000" sync_max="18000" pulse_type="POSITIVE">
+ <channel function="THROTTLE" min="991" neutral="1496" max="1993" average="0"/>
+ <channel function="YAW" min="998" neutral="1501" max="2005" average="0"/>
+ <channel function="PITCH" min="987" neutral="1505" max="2011" average="0"/>
+ <channel function="ROLL" min="1001" neutral="1500" max="2003" average="0"/>
+ <channel function="MODE" min="987" neutral="1500" max="2011" average="0"/>
+ <channel function="GAIN1" min="987" neutral="1500" max="1998" average="0"/>
+ <channel function="GAIN2" min="987" neutral="1500" max="2011" average="0"/>
+ <channel function="CRUISE_MODE" min="987" neutral="1500" max="2011" average="0" reverse="1"/>
+</radio>
