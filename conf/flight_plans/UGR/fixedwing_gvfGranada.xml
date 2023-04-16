@@ -9,13 +9,13 @@ static inline float wp_dist(float wp1_x, float wp1_y, float wp2_x, float wp2_y) 
 }
 </header>
   <waypoints>
-    <waypoint name="HOME" x="-0.648" y="-0.647"/>
+    <waypoint alt="713" name="HOME" x="-0.648" y="-0.647"/>
     <waypoint alt="753" name="STDBY" x="-45.3105" y="45.252"/>
     <waypoint alt="753" name="ELLIPSE" x="-64.4723" y="64.9948"/>
-    <waypoint alt="753" name="CLIMB" x="-33.488" y="-25.061"/>
+    <waypoint alt="753" name="CLIMB" x="-77.375" y="-46.790"/>
     <waypoint alt="718" name="AF" x="-44.1543" y="-30.2445"/>
     <waypoint alt="718" name="TD" x="29.784" y="5.24597"/>
-    <waypoint alt="723"name="_BASELEG" x="-58.3398" y="6.0045"/>
+    <waypoint alt="723" name="_BASELEG" x="-58.3398" y="6.0045"/>
 
     <!-- Sectors waypoints -->
     <waypoint name="_N1" x="-84.7786" y="-76.0048"/>
@@ -36,6 +36,7 @@ static inline float wp_dist(float wp1_x, float wp1_y, float wp2_x, float wp2_y) 
   <variables>
     <variable var="a_stb" init="40.0" min="1.0" max="150.0" step="1.0"/>
     <variable var="b_stb" init="40.0" min="1.0" max="150.0" step="1.0"/>
+    <variable var="alpha_stb" init="0.0" min="0.0" max="180.0" step="1.0"/>
     <variable var="land_rad" init="40.0" min="1.0" max="150.0" step="1.0"/>
   </variables>
   
@@ -64,7 +65,7 @@ static inline float wp_dist(float wp1_x, float wp1_y, float wp2_x, float wp2_y) 
 
     <!-- need this for simulation, manual takeoff for real testing -->
     <block key="t" name="Takeoff" strip_button="Takeoff (wp CLIMB)" strip_icon="takeoff.png" group="home">
-      <exception cond="GetPosAlt() @GT (ground_alt+45)" deroute="Standby"/>
+      <exception cond="GetPosAlt() @GT (GetAltRef() + 50)" deroute="Standby"/> <!--TODO: Fix it-->
       <set value="0" var="autopilot.kill_throttle"/>
       <set value="0" var="autopilot.flight_time"/>
       <set value="1" var="autopilot.launch"/>
@@ -74,7 +75,7 @@ static inline float wp_dist(float wp1_x, float wp1_y, float wp2_x, float wp2_y) 
     <block key="s" name="Standby" strip_button="Standby" strip_icon="home.png" group="home">
       <call_once fun="NavVerticalAutoThrottleMode(0.0)"/>
       <call_once fun="NavVerticalAltitudeMode(flight_altitude, 0.0)"/>
-      <call fun="gvf_ellipse_wp(WP_STDBY, a_stb, b_stb, 0.0)"/>
+      <call fun="gvf_ellipse_wp(WP_STDBY, a_stb, b_stb, alpha_stb)"/>
     </block>
     
     <block name="ellipse_wp" strip_icon="oval.png">
@@ -85,7 +86,7 @@ static inline float wp_dist(float wp1_x, float wp1_y, float wp2_x, float wp2_y) 
 
     <!--block name="2D_trefoil_wp" strip_icon="eight.png"> 
       <call fun="gvf_parametric_2D_trefoil_wp(WP_P1, gvf_parametric_2d_trefoil_par.w1, gvf_parametric_2d_trefoil_par.w2, gvf_parametric_2d_trefoil_par.ratio, gvf_parametric_2d_trefoil_par.r, gvf_parametric_2d_trefoil_par.alpha)"/>
-    </block--->
+    </block-->
 
     <!--block name="3D_ellipse_wp" strip_icon="oval.png">
 	<call fun="gvf_parametric_3D_ellipse_wp(WP_ELLIPSE, gvf_parametric_3d_ellipse_par.r, gvf_parametric_3d_ellipse_par.zl, gvf_parametric_3d_ellipse_par.zh, gvf_parametric_3d_ellipse_par.alpha)"/>

@@ -70,7 +70,7 @@
     </block>
     
     <block name="DCF" strip_button="DCF" strip_icon="oval.png">
-      <call fun="distributed_circular(WP_ELLIPSE)"/>
+      <call fun="distributed_circular(a_stb)"/>
     </block>
     
     <block name="line_to_HOME" strip_icon="home_drop.png"> 

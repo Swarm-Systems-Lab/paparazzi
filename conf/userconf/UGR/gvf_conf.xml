@@ -1,0 +1,57 @@
+<conf>
+  <aircraft
+   name="gvf_opterra_12"
+   ac_id="200"
+   airframe="airframes/UGR/opterra.xml"
+   radio="radios/T16SZ_SBUS.xml"
+   telemetry="telemetry/GVF/gvf_default_fixedwing.xml"
+   flight_plan="flight_plans/UGR/fixedwing_gvfGranada.xml"
+   settings="settings/fixedwing_basic.xml"
+   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/guidance_full_pid_fw.xml modules/gvf_module.xml~GVF~ modules/imu_common.xml modules/nav_basic_fw.xml modules/power_switch.xml modules/stabilization_adaptive_fw.xml"
+   gui_color="blue"
+  />
+  <aircraft
+   name="gvf_sonic2"
+   ac_id="5"
+   airframe="airframes/UCM/sonic2.xml"
+   radio="radios/cockpitSX.xml"
+   telemetry="telemetry/GVF/gvf_default_fixedwing.xml"
+   flight_plan="flight_plans/UCM/fixedwing_gvfMission.xml"
+   settings="settings/fixedwing_basic.xml"
+   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_full_pid_fw.xml modules/gvf_module.xml~GVF~ modules/gvf_parametric.xml~GVF_PARAMETRIC~ modules/imu_common.xml modules/nav_basic_fw.xml modules/power_switch.xml modules/stabilization_adaptive_fw.xml"
+   gui_color="blue"
+  />
+  <aircraft
+   name="st_rover_n1"
+   ac_id="1"
+   airframe="airframes/UGR/steering_rover_n1.xml"
+   radio="radios/UGR/FrSkyX20.xml"
+   telemetry="telemetry/GVF/gvf_rover.xml"
+   flight_plan="flight_plans/UGR/steering_rover_CBF_mission.xml"
+   settings=""
+   settings_modules=""
+   gui_color="blue"
+  />
+  <aircraft
+   name="st_rover_n2"
+   ac_id="2"
+   airframe="airframes/UGR/steering_rover_n2.xml"
+   radio="radios/UGR/T16SZ_SBUS_rover.xml"
+   telemetry="telemetry/GVF/gvf_rover.xml"
+   flight_plan="flight_plans/UGR/steering_rover_CBF_mission.xml"
+   settings=""
+   settings_modules=""
+   gui_color="green"
+  />
+  <aircraft
+   name="st_rover_n3"
+   ac_id="3"
+   airframe="airframes/UGR/steering_rover_n3.xml"
+   radio="radios/UGR/FrSkyX20.xml"
+   telemetry="telemetry/GVF/gvf_rover.xml"
+   flight_plan="flight_plans/UGR/steering_rover_CBF_mission.xml"
+   settings=""
+   settings_modules=""
+   gui_color="red"
+  />
+</conf>

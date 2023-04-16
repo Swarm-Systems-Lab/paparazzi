@@ -1,0 +1,43 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="cbf" dir="multi/cbf">
+  <doc>
+    <description>Distributed collision avoidance algorithm based on Collision Cone Barrier Functions (C3BF).
+    Currently, this module is designed for the steering rover dynamics.
+    References: 
+    - Introduction to Control Lyapunov Functions and Control Barrier Functions, https://youtu.be/_Tkn_Hzo4AA
+    - Control Barrier Functions in UGVs for Kinematic Obstacle Avoidance: A Collision Cone Approach, https://arxiv.org/abs/2209.11524
+    </description>
+    <section name="Parameters" prefix="CBF_">
+      <define name="R" value="1.0" description="Radius of the conservative circle around the agents."/>
+      <define name="GAMMA" value="1.0" description="This constant will help the controller to avoid discontinuities. The lower gamma is, the harder it is for the controller to satisfy the CBF constaint."/>
+      <define name="OMEGA_SAFE_MAX" value="1.0" description="s"/>
+    </section>
+  </doc>
+
+  <settings name="CBF">
+    <dl_settings>
+      <dl_settings NAME="CBF">
+        <dl_setting MAX="5" MIN="0" STEP="0.1" VAR="cbf_control.r" shortname = "CBF_radius" param="CBF_R"/>
+        <dl_setting MAX="10" MIN="0" STEP="0.1" VAR="cbf_control.gamma" shortname = "CBF_gamma" param="CBF_GAMMA"/>
+        <dl_setting MAX="20" MIN="0" STEP="0.1" VAR="cbf_control.omega_safe_max" shortname = "CBF_omegaSafeMax" param="CBF_OMEGA_SAFE_MAX"/>
+       </dl_settings>
+    </dl_settings>
+  </settings>
+
+  <dep>
+    <depends>traffic_info</depends> <!--TODO: No depender de traffic_info, generar un mensaje de -->
+  </dep>
+
+  <header>
+    <file name="cbf.h"/>
+  </header>
+
+  <init fun="cbf_init()"/>
+
+  <makefile firmware="rover">
+    <file name="cbf.c"/>
+  </makefile>
+
+</module>
+

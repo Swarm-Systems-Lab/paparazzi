@@ -35,7 +35,7 @@
     <module name="ins" type="alt_float"/>
     <module name="control" type="new"/>
     <module name="navigation"/>
-    <module name="tlsf"/>
+    <!--module name="tlsf"/-->
     
     <module name="gps" type="ublox">
       <configure name="GPS_BAUD" value="B115200"/>
@@ -256,6 +256,9 @@
     <define name="JSBSIM_MODEL" value="easystar" type="string"/>
     <define name="SENSORS_PARAMS" value="nps_sensors_params_default.h" type="string"/>
   </section>
-
+  
+  <section name="GCS">
+    <define name="AC_ICON" value="flyingwing"/>
+  </section>
 </airframe>
 

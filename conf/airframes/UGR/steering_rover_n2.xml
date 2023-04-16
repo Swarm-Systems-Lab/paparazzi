@@ -24,8 +24,8 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
       <define name="NPS_BYPASS_AHRS"   value="TRUE"/>
       <define name="NPS_BYPASS_INS"    value="TRUE"/>
       <!-- Multiple agents simulation -->
-      <!--configure name="MODEM_PORT_OUT" value="4244"/>
-      <configure name="MODEM_PORT_IN"  value="4245"/-->
+      <configure name="MODEM_PORT_OUT" value="4246"/>
+      <configure name="MODEM_PORT_IN"  value="4247"/>
     </target>    
     
     <module name="actuators" type="pwm"/>
@@ -51,7 +51,8 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
     </module>
     
     <module name="distributed_circular_formation"/>
-    
+    <module name="cbf"/>
+
     <module name="guidance" type="rover_steering">
       <define name="MAX_DELTA"            value="15.0"/>
       <define name="DRIVE_SHAFT_DISTANCE" value="0.25"/>
@@ -67,7 +68,7 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
   <servos> 
     <!-- "no" ... -->
     <servo name="MOTOR_THROTTLE" no="0" min="1000" neutral="1500" max="2000"/>
-    <servo name="MOTOR_STEERING" no="3" min="1000" neutral="1500" max="2000"/>
+    <servo name="MOTOR_STEERING" no="3" min="1000" neutral="1400" max="1700"/>
   </servos> 
   
   <!-- Low level commands (PWM signal) -->

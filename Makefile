@@ -318,13 +318,9 @@ test_openuas: all
 test_tudelft: all
 	CONF_XML=conf/userconf/tudelft/conf.xml prove tests/aircrafts/
 
-# test GVF conf
-test_gvf: all
-	CONF_XML=conf/userconf/GVF/gvf_conf.xml prove tests/aircrafts/
-
-# test GVF multiagents conf	
-test_gvf_multi: all
-	CONF_XML=conf/userconf/GVF/gvf_multi_conf.xml prove tests/aircrafts/
+# test UGR conf
+test_ugr: all
+	CONF_XML=conf/userconf/UGR/conf.xml prove tests/aircrafts/
 	
 # compiles all aircrafts in conf_tests.xml
 test_examples: all

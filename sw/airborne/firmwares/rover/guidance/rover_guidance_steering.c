@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Jesús Bautista <jesusbautistavillar@gmail.com> 
+ * Copyright (C) 2021 Jesús Bautista <jesbauti20@gmail.com> 
  *                    Hector García  <noeth3r@gmail.com>
  *
  * This file is part of paparazzi.
@@ -32,7 +32,12 @@
 #include "navigation.h"
 #include "state.h"
 
-#include "filters/pid.h" // Used for p+i speed controller
+// GVF (+ optional CBF) controller
+#include "modules/guidance/gvf/gvf.h"
+#include "modules/multi/cbf/cbf.h"
+
+// P+I speed controller
+#include "filters/pid.h" 
 
 #include <math.h>
 #include <stdio.h>
@@ -68,12 +73,21 @@ void rover_guidance_steering_init(void)
 
 /** CTRL functions **/
 // Steering control (GVF)
-void rover_guidance_steering_heading_ctrl(float omega) //GVF give us this omega
+void rover_guidance_steering_heading_ctrl(void)
 {
   float delta = 0.0;
 
   // Speed is bounded to avoid GPS noise while driving at small velocity
   float speed = BoundSpeed(stateGetHorizontalSpeedNorm_f()); 
+
+  // Get omega from GVF controller
+  float omega = gvf_control.omega;
+
+// ----------------------
+  // Get safe_omega from the CBF controller
+  cbf_run(omega);
+  omega = omega + cbf_control.omega_safe;
+// ----------------------
 
   if (fabs(omega)>0.0) {
       delta = DegOfRad(-atanf(omega*DRIVE_SHAFT_DISTANCE/speed));

@@ -11,7 +11,6 @@
       <include name="modules/gps/gps.h"/>
       <include name="modules/actuators/actuators.h"/>
       <include name="modules/radio_control/radio_control.h"/>
-      <include name="modules/guidance/gvf/gvf.h"/>
       <include name="navigation.h"/>
       <include name="state.h"/>
 
@@ -82,7 +81,7 @@
       </control>
       <control>
         <call fun="SetCommandsFromRC(commands, radio_control.values)"/>
-        <call fun="rover_guidance_steering_heading_ctrl(-gvf_control.omega)"/>
+        <call fun="rover_guidance_steering_heading_ctrl()"/>
 
         <call fun="commands[COMMAND_STEERING] = GetCmdFromDelta(guidance_control.cmd.delta);"/>
         <call fun="SetActuatorsFromCommands(commands, autopilot_get_mode())"/>
@@ -104,7 +103,7 @@
       </control>
       <control>
         <call fun="rover_guidance_steering_speed_ctrl()"/>
-        <call fun="rover_guidance_steering_heading_ctrl(-gvf_control.omega)"/> <!-- TODO: revise this -1 * omega -->
+        <call fun="rover_guidance_steering_heading_ctrl()"/>
 
         <call fun="commands[COMMAND_STEERING] = GetCmdFromDelta(guidance_control.cmd.delta);"/>
         <call fun="commands[COMMAND_THROTTLE] = GetCmdFromThrottle(guidance_control.throttle);"/>

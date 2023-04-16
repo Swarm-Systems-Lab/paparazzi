@@ -15,10 +15,11 @@
   <sectors/>
   
   <variables>
-    <variable init="5.0" max="20.0" min="1.0" step="1.0" var="a_stb"/>
-    <variable init="5.0" max="20.0" min="1.0" step="1.0" var="b_stb"/>
+    <variable init="5.0" max="20.0" min="1.0" step="0.5" var="a_stb"/>
+    <variable init="5.0" max="20.0" min="1.0" step="0.5" var="b_stb"/>
+    <variable init="0.0" max="90.0" min="-90.0" step="0.5" var="alpha_stb"/>
   </variables>
-  
+
   <blocks>
     <block name="Wait GPS" strip_icon="gps.png">
       <call_once fun="NavKillThrottle()"/>
@@ -37,7 +38,7 @@
     </block>
     
     <block name="Standby" strip_button="Standby" strip_icon="home.png">
-      <call fun="gvf_ellipse_wp(WP_STDBY, a_stb, b_stb, 0)"/>
+      <call fun="gvf_ellipse_wp(WP_STDBY, a_stb, b_stb, alpha_stb)"/>
     </block>
     
     <block name="line_to_HOME" strip_icon="home_drop.png">
@@ -47,17 +48,10 @@
     <block name="ellipse_wp" strip_icon="oval.png">
       <call fun="gvf_ellipse_wp(WP_ELLIPSE, gvf_ellipse_par.a, gvf_ellipse_par.b, gvf_ellipse_par.alpha)"/>
     </block>
-    
-    <block name="line_P1_P2" strip_icon="line.png">
-      <call fun="gvf_line_wp1_wp2(WP_P1, WP_P2)"/>
+
+    <block name="DCF" strip_button="DCF" strip_icon="oval.png">
+      <call fun="distributed_circular(WP_ELLIPSE)"/>
     </block>
-    
-    <block name="segment_turn_P1_P2" strip_icon="line.png">
-      <call fun="gvf_segment_loop_wp1_wp2(WP_P1, WP_P2, gvf_segment_par.d1, gvf_segment_par.d2)"/>
-    </block>
-    
-    <block name="sin_p1_p2" strip_icon="line_drop.png">
-      <call fun="gvf_sin_wp1_wp2(WP_P1, WP_P2, gvf_sin_par.w, gvf_sin_par.off, gvf_sin_par.A)"/>
-    </block>
+
   </blocks>
 </flight_plan>
