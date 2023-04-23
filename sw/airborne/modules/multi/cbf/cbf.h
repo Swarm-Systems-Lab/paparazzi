@@ -33,43 +33,69 @@
 #if defined(ROVER_FIRMWARE)
 #include "firmwares/rover/navigation.h"
 #include "state.h"
+#define CBF_AUTO2 MODE_AUTO2
 
 #else
 #error "CBF does not support your firmware yet!"
 #endif
 
-#ifndef OMEGA_SAFE_MAX
-#define OMEGA_SAFE_MAX 5
+// Default number of neighbors per aircraft
+#ifndef CBF_MAX_NEIGHBORS
+#define CBF_MAX_NEIGHBORS 4
 #endif
 
+//
+#ifndef CBF_NEI_AC_IDS
+#error "You have to define CBF_NEI_AC_IDS in the ariframe file!"
+#endif // CBF_NEI_AC_IDS
+
 /* Structures */
-struct cbf_con {
+
+// CBF parameters
+struct cbf_param {
   float r;
   float gamma;
   float omega_safe_max;
+  float timeout;
+  float broadtime;
+};
 
+// CBF control
+struct cbf_con {
   float omega_safe;
+  uint16_t n_neighborns;
+  uint32_t last_transmision;
 };
 
+// CBF state
+typedef struct{
+  float x;
+  float y;
+  float vx;
+  float vy;
+  float speed;
+  float course;
+} cbf_state_t;
+
+// CBF obstacle tables
+typedef struct{
+  uint16_t ac_id;
+  cbf_state_t state;
+  
+  bool available;
+  uint32_t t_last_msg;
+} cbf_tab_entrie_t;
+
+// Structure definitions --
+extern struct cbf_param cbf_params;
 extern struct cbf_con cbf_control;
-
-struct cbf_stat {
-  float my_x;
-  float my_y;
-  float my_speed;
-  float my_course;
-
-  float ac_x;
-  float ac_y;
-  float ac_speed;
-  float ac_course;
-};
-
-extern struct cbf_stat cbf_states;
+extern cbf_state_t cbf_ac_state;
+extern cbf_tab_entrie_t cbf_obs_tables[CBF_MAX_NEIGHBORS];
 
 /* Functions */
 
 extern void cbf_init(void);
 extern void cbf_run(float u_ref);
+extern void parse_CBF_STATE(uint8_t *buf);
 
 #endif // CBF_H

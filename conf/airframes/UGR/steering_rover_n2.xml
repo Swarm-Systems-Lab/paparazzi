@@ -51,7 +51,9 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
     </module>
     
     <module name="distributed_circular_formation"/>
-    <module name="cbf"/>
+    <module name="cbf">
+      <define name="CBF_NEI_AC_IDS" value="{1,3}"/>
+    </module>
 
     <module name="guidance" type="rover_steering">
       <define name="MAX_DELTA"            value="15.0"/>

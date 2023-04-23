@@ -11,29 +11,31 @@
     <section name="Parameters" prefix="CBF_">
       <define name="R" value="1.0" description="Radius of the conservative circle around the agents."/>
       <define name="GAMMA" value="1.0" description="This constant will help the controller to avoid discontinuities. The lower gamma is, the harder it is for the controller to satisfy the CBF constaint."/>
-      <define name="OMEGA_SAFE_MAX" value="1.0" description="s"/>
+      <define name="OMEGA_SAFE_MAX" value="1.0" description="Maximum value of the CBF control variable (omega_safe, un rad/s)."/>
+      <define name="TIMEOUT" value="1500" description="After this time (in ms) if we do not have any msg from a neighborh, we ignore it"/>
+      <define name="BROADTIME" value="200" description="Time (in ms) for transmiting the AC state to their neighbors"/>
     </section>
   </doc>
 
   <settings name="CBF">
     <dl_settings>
       <dl_settings NAME="CBF">
-        <dl_setting MAX="5" MIN="0" STEP="0.1" VAR="cbf_control.r" shortname = "CBF_radius" param="CBF_R"/>
-        <dl_setting MAX="10" MIN="0" STEP="0.1" VAR="cbf_control.gamma" shortname = "CBF_gamma" param="CBF_GAMMA"/>
-        <dl_setting MAX="20" MIN="0" STEP="0.1" VAR="cbf_control.omega_safe_max" shortname = "CBF_omegaSafeMax" param="CBF_OMEGA_SAFE_MAX"/>
+        <dl_setting MAX="5" MIN="0" STEP="0.1" VAR="cbf_params.r" shortname = "CBF_radius" param="CBF_R"/>
+        <dl_setting MAX="10" MIN="0" STEP="0.1" VAR="cbf_params.gamma" shortname = "CBF_gamma" param="CBF_GAMMA"/>
+        <dl_setting MAX="20" MIN="0" STEP="0.1" VAR="cbf_params.omega_safe_max" shortname = "CBF_omegaSafeMax" param="CBF_OMEGA_SAFE_MAX"/>
+        <dl_setting MAX="50000" MIN="10" STEP="10" VAR="cbf_params.timeout" shortname = "CBF_timeout" param="CBF_TIMEOUT"/>
+        <dl_setting MAX="5000" MIN="10" STEP="10" VAR="cbf_params.broadtime" shortname = "CBF_broadtime" param="CBF_BROADTIME"/>
        </dl_settings>
     </dl_settings>
   </settings>
-
-  <dep>
-    <depends>traffic_info</depends> <!--TODO: No depender de traffic_info, generar un mensaje de -->
-  </dep>
 
   <header>
     <file name="cbf.h"/>
   </header>
 
   <init fun="cbf_init()"/>
+
+  <datalink message="CBF_STATE" fun="parse_CBF_STATE(buf)" class="telemetry"/>
 
   <makefile firmware="rover">
     <file name="cbf.c"/>
