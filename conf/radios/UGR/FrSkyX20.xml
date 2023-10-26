@@ -28,7 +28,7 @@ Boston, MA 02111-1307, USA.
  <channel function="THROTTLE" min="991" neutral="1496" max="1993" average="0"/>
  <channel function="YAW" min="998" neutral="1501" max="2005" average="0"/>
  <channel function="PITCH" min="987" neutral="1505" max="2011" average="0"/>
- <channel function="ROLL" min="1001" neutral="1500" max="2003" average="0"/>
+ <channel function="ROLL" min="1001" neutral="1500" max="2003" average="0" reverse="1"/>
  <channel function="MODE" min="987" neutral="1500" max="2011" average="0"/>
  <channel function="GAIN1" min="987" neutral="1500" max="1998" average="0"/>
  <channel function="GAIN2" min="987" neutral="1500" max="2011" average="0"/>

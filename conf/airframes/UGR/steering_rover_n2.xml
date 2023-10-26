@@ -70,7 +70,7 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
   <servos> 
     <!-- "no" ... -->
     <servo name="MOTOR_THROTTLE" no="0" min="1000" neutral="1500" max="2000"/>
-    <servo name="MOTOR_STEERING" no="3" min="1000" neutral="1400" max="1700"/>
+    <servo name="MOTOR_STEERING" no="3" min="1700" neutral="1400" max="1000"/>
   </servos> 
   
   <!-- Low level commands (PWM signal) -->
@@ -124,6 +124,14 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
   </section>
 
   <section name="SIMULATOR" prefix="NPS_">
+  </section>
+  
+  <section name="GVF" prefix="GVF_">
+    <define name="ELLIPSE_KE" value="1.5"/>
+    <define name="ELLIPSE_KN" value="1.5"/>
+    <define name="ELLIPSE_A" value="5"/>
+    <define name="ELLIPSE_B" value="5"/>
+    <define name="ELLIPSE_ALPHA" value="0"/>
   </section>
   
   <!-- LiPo 3300mA 7.4V 2S1P CELL (Soaring)-->

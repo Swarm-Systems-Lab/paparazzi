@@ -18,8 +18,8 @@
     <target name="nps" board="pc">
       <module name="radio_control" type="ppm"/>
       <module name="fdm" type="jsbsim"/>
-      <!--configure name="MODEM_PORT_OUT" value="4246"/>
-      <configure name="MODEM_PORT_IN" value="4247"/-->
+      <configure name="MODEM_PORT_OUT" value="4246"/>
+      <configure name="MODEM_PORT_IN" value="4247"/>
     </target>
 
     <module name="telemetry" type="xbee_api"/>
@@ -45,7 +45,7 @@
   </firmware>
 
   <servos>
-    <servo name="MOTOR" no="0" min="1120" neutral="1120" max="1900"/>
+    <servo name="MOTOR" no="0" min="1100" neutral="1100" max="1810"/>
     <servo name="AILEVON_RIGHT" no="1" max="2000" neutral="1500" min="1000"/>
     <servo name="AILEVON_LEFT" no="2" max="1000" neutral="1500" min="2000"/>
   </servos>
@@ -110,16 +110,16 @@
     <define name="ACCEL_X_SIGN" value="1"/>
     <define name="ACCEL_Y_SIGN" value="1"/>
     <define name="ACCEL_Z_SIGN" value="-1"/>
-    <define name="ACCEL_X_NEUTRAL" value="109"/>
-    <define name="ACCEL_Y_NEUTRAL" value="13"/>
-    <define name="ACCEL_Z_NEUTRAL" value="-404"/>
-    <define name="ACCEL_X_SENS" value="2.45045342816" integer="16"/>
-    <define name="ACCEL_Y_SENS" value="2.44747844234" integer="16"/>
-    <define name="ACCEL_Z_SENS" value="2.42689216106" integer="16"/>
+    <define name="ACCEL_X_NEUTRAL" value="-62"/>
+    <define name="ACCEL_Y_NEUTRAL" value="-50"/>
+    <define name="ACCEL_Z_NEUTRAL" value="160"/>
+    <define name="ACCEL_X_SENS" value="2.45261569569" integer="16"/>
+    <define name="ACCEL_Y_SENS" value="2.46094125707" integer="16"/>
+    <define name="ACCEL_Z_SENS" value="2.43253404559" integer="16"/>
 
-    <define name="BODY_TO_IMU_PHI" value="0"/>
-    <define name="BODY_TO_IMU_THETA" value="-0.0349069999999"/>
-    <define name="BODY_TO_IMU_PSI" value="0"/>
+    <define name="BODY_TO_IMU_PHI" value="0"/> <!-- Roll -->
+    <define name="BODY_TO_IMU_THETA" value="0.0"/> <!-- Pitch -->
+    <define name="BODY_TO_IMU_PSI" value="0"/> <!-- Yaw -->
   </section>
 
   <section name="INS" prefix="INS_">
@@ -164,7 +164,7 @@
     <!-- Climb loop (throttle) -->
     <define name="AUTO_THROTTLE_CLIMB_THROTTLE_INCREMENT" value="0.07" unit="%/(m/s)"/>
     <define name="AUTO_THROTTLE_PGAIN" value="0.012"/>
-    <define name="AUTO_THROTTLE_DGAIN" value="0.002"/>
+    <define name="AUTO_THROTTLE_DGAIN" value="0.000"/>
     <define name="AUTO_THROTTLE_IGAIN" value="0.011"/>
     <define name="AUTO_THROTTLE_PITCH_OF_VZ_PGAIN" value="0.1"/>
 
@@ -176,7 +176,7 @@
     <define name="AUTO_PITCH_MIN_PITCH" value="-20" unit="deg"/>
 
     <!-- Trims -->
-    <define name="PITCH_TRIM" value="0.5" unit="deg"/>
+    <define name="PITCH_TRIM" value="2" unit="deg"/>
 
     <!-- airspeed control -->
     <!--XPA NOT USED />
@@ -208,7 +208,7 @@
     <define name="COURSE_PGAIN" value="0.743"/>
     <!--XPA NOT USED />
     <define name="COURSE_TAU" value="0.5"/-->
-    <define name="ROLL_MAX_SETPOINT" value="50.0000214859" unit="deg"/>
+    <define name="ROLL_MAX_SETPOINT" value="40." unit="deg"/>
     <define name="PITCH_MAX_SETPOINT" value="30." unit="deg"/>
     <define name="PITCH_MIN_SETPOINT" value="-30." unit="deg"/>
 

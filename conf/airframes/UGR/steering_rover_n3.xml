@@ -126,6 +126,14 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
   <section name="SIMULATOR" prefix="NPS_">
   </section>
   
+  <section name="GVF" prefix="GVF_">
+    <define name="ELLIPSE_KE" value="1.5"/>
+    <define name="ELLIPSE_KN" value="1.5"/>
+    <define name="ELLIPSE_A" value="5"/>
+    <define name="ELLIPSE_B" value="5"/>
+    <define name="ELLIPSE_ALPHA" value="0"/>
+  </section>
+  
   <!-- LiPo 3300mA 7.4V 2S1P CELL (Soaring)-->
   <section name="BAT">
     <define name="CATASTROPHIC_BAT_LEVEL"    value="6.20" unit="V"/> <!-- 3.1 V per cell -->
