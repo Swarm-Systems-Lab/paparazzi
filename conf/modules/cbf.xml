@@ -2,16 +2,16 @@
 
 <module name="cbf" dir="multi/cbf">
   <doc>
-    <description>Distributed collision avoidance algorithm based on Collision Cone Barrier Functions (C3BF).
+    <description>Distributed collision avoidance algorithm based on Control Cone Barrier Functions (C3BF).
     Currently, this module is designed for the steering rover dynamics.
     References: 
     - Introduction to Control Lyapunov Functions and Control Barrier Functions, https://youtu.be/_Tkn_Hzo4AA
     - Control Barrier Functions in UGVs for Kinematic Obstacle Avoidance: A Collision Cone Approach, https://arxiv.org/abs/2209.11524
     </description>
     <section name="Parameters" prefix="CBF_">
-      <define name="R" value="1.0" description="Radius of the conservative circle around the agents."/>
-      <define name="GAMMA" value="1.0" description="This constant will help the controller to avoid discontinuities. The lower gamma is, the harder it is for the controller to satisfy the CBF constaint."/>
-      <define name="OMEGA_SAFE_MAX" value="1.0" description="Maximum value of the CBF control variable (omega_safe, un rad/s)."/>
+      <define name="R" value="1.0" description="Radius of the conservative circle around the agents (virtual obstacle)."/>
+      <define name="GAMMA" value="1.0" description="This constant will help the controller to avoid discontinuities."/>
+      <define name="OMEGA_SAFE_MAX" value="1.0" description="Maximum value of the CBF control variable (omega_safe, in rad/s)."/>
       <define name="TIMEOUT" value="1500" description="After this time (in ms) if we do not have any msg from a neighborh, we ignore it"/>
       <define name="BROADTIME" value="200" description="Time (in ms) for transmiting the AC state to their neighbors"/>
     </section>

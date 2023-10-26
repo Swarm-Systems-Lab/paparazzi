@@ -79,25 +79,6 @@ static void send_cbf(struct transport_tx *trans, struct link_device *dev)
 
 #endif // PERIODIC TELEMETRY
 
-static void cbf_low_level_getState(void)
-{
-  cbf_ac_state.x = stateGetPositionEnu_f()->x;
-  cbf_ac_state.y = stateGetPositionEnu_f()->y;
-  cbf_ac_state.speed = stateGetHorizontalSpeedNorm_f();
-  #if defined(FIXEDWING_FIRMWARE)
-    gvf_state.course = 90 - stateGetHorizontalSpeedDir_f();      // ENU course
-    gvf_state.vx = cbf_ac_state.speed * sinf(gvf_state.course);
-    gvf_state.vy = cbf_ac_state.speed * cosf(gvf_state.course);
-    
-  #elif defined(ROVER_FIRMWARE)
-    // We assume that the course and psi
-    // of the rover (steering wheel) are the same
-    cbf_ac_state.course = 90 - stateGetNedToBodyEulers_f()->psi; // ENU course
-    cbf_ac_state.vx = stateGetSpeedEnu_f()->x;
-    cbf_ac_state.vy = stateGetSpeedEnu_f()->y;
-  #endif
-}
-
 // Bound omega_safe
 static float BoundOmega(float omega){
   return (omega < -cbf_params.omega_safe_max ? -cbf_params.omega_safe_max :
@@ -158,9 +139,9 @@ void cbf_init(void)
     cbf_telemetry.acs_timeslost[i] = 0; // for telemetry
   }
 
-  #if PERIODIC_TELEMETRY
+#if PERIODIC_TELEMETRY
   register_periodic_telemetry(DefaultPeriodic, PPRZ_MSG_ID_CBF, send_cbf);
-  #endif // PERIODIC_TELEMETRY
+#endif // PERIODIC_TELEMETRY
 }
 
 void cbf_run(float u_ref, int8_t s) 
@@ -169,14 +150,21 @@ void cbf_run(float u_ref, int8_t s)
   cbf_ac_state.uref = -u_ref;
 
   /* Get the AC state*/
-  cbf_low_level_getState();
+  cbf_ac_state.x = stateGetPositionEnu_f()->x;
+  cbf_ac_state.y = stateGetPositionEnu_f()->y;
+  cbf_ac_state.speed = stateGetHorizontalSpeedNorm_f();
+
+  cbf_ac_state.vx = stateGetSpeedEnu_f()->x;
+  cbf_ac_state.vy = stateGetSpeedEnu_f()->y;
+
+  cbf_ac_state.course = 90 - stateGetNedToBodyEulers_f()->psi; // ENU course
 
   float cs_i = cosf(cbf_ac_state.course);
   float sn_i = sinf(cbf_ac_state.course);
-  
-  /* Run CBF, one time for each possible neighborn */
+
   uint32_t now = get_sys_time_msec();
 
+  /* Run CBF, one time for each possible neighborn */
   float omega_safe = 0.0;
   for (uint8_t j = 0; j < CBF_MAX_NEIGHBORS; ++j)  {
 
@@ -223,10 +211,10 @@ void cbf_run(float u_ref, int8_t s)
       float vy_rel_dot2 = cbf_obs_tables[j].state.speed * (-cs_j);
 
       float vx_rel_dot_ref = vx_rel_dot2 * cbf_obs_tables[j].state.uref + 
-                              vx_rel_dot1 * cbf_ac_state.uref;
+                             vx_rel_dot1 * cbf_ac_state.uref;
 
       float vy_rel_dot_ref = vy_rel_dot2 * cbf_obs_tables[j].state.uref + 
-                              vy_rel_dot1 * cbf_ac_state.uref;
+                             vy_rel_dot1 * cbf_ac_state.uref;
 
 
       // h(x,t)
@@ -269,13 +257,13 @@ void cbf_run(float u_ref, int8_t s)
 
     // Telemetry variables -----
     cbf_telemetry.uref[j]      = cbf_obs_tables[j].state.uref;
-    cbf_telemetry.px_rel[j]    = px_rel;
-    cbf_telemetry.py_rel[j]    = py_rel;
-    cbf_telemetry.vx_rel[j]    = vx_rel;
-    cbf_telemetry.vy_rel[j]    = vy_rel;
-    cbf_telemetry.h_ref[j]     = h_ref;
-    cbf_telemetry.h_dot_ref[j] = h_dot_ref;
-    cbf_telemetry.psi_ref[j]   = psi;
+    cbf_telemetry.px_rel[j]     = px_rel;
+    cbf_telemetry.py_rel[j]     = py_rel;
+    cbf_telemetry.vx_rel[j]     = vx_rel;
+    cbf_telemetry.vy_rel[j]     = vy_rel;
+    cbf_telemetry.h_ref[j]      = h_ref;
+    cbf_telemetry.h_dot_ref[j]  = h_dot_ref;
+    cbf_telemetry.psi_ref[j]    = psi;
     // -------------------------
   }
 

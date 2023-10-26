@@ -85,7 +85,7 @@ void rover_guidance_steering_heading_ctrl(void)
 
 // ----------------------
   // Get safe_omega from the CBF controller
-  cbf_run(omega);
+  cbf_run(omega, gvf_control.s);
   omega = omega + cbf_control.omega_safe;
 // ----------------------
 
