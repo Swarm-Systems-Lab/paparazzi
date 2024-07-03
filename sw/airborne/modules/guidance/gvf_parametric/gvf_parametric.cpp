@@ -235,7 +235,7 @@ void gvf_parametric_control_3D(float kx, float ky, float kz, float f1, float f2,
   struct EnuCoor_f *pos_enu = stateGetPositionEnu_f();
   float x = pos_enu->x;
   float y = pos_enu->y;
-  float z = pos_enu->z;
+  float z = pos_enu->z - ground_alt;
 
   float phi1 = L * (x - f1);
   float phi2 = L * (y - f2);
