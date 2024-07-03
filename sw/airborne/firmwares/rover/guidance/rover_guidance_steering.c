@@ -25,6 +25,7 @@
 #include "firmwares/rover/guidance/rover_guidance_steering.h"
 
 #include "generated/airframe.h"
+#include "generated/modules.h"
 
 #include "modules/actuators/actuators_default.h"
 #include "modules/radio_control/radio_control.h"
@@ -34,7 +35,6 @@
 
 // GVF (+ optional CBF) controller
 #include "modules/guidance/gvf/gvf.h"
-#include "modules/multi/cbf/cbf.h"
 
 // P+I speed controller
 #include "filters/pid.h" 
@@ -82,12 +82,6 @@ void rover_guidance_steering_heading_ctrl(void)
 
   // Get omega from GVF controller
   float omega = gvf_control.omega;
-
-// ----------------------
-  // Get safe_omega from the CBF controller
-  cbf_run(omega, gvf_control.s);
-  omega = omega + cbf_control.omega_safe;
-// ----------------------
 
   if (fabs(omega)>0.0) {
       delta = DegOfRad(-atanf(omega*DRIVE_SHAFT_DISTANCE/speed));

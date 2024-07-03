@@ -6,7 +6,7 @@
       Bitcraze syslink module
     </description>
     <configure name="SYSLINK_PORT" value="UARTX" description="Select syslink port"/>
-    <configure name="SYSLINK_BAUD" value="B1000000" description="Syslink baudrate"/>
+    <configure name="SYSLINK_BAUD" value="B3000000" description="Syslink baudrate"/>
   </doc>
   <header>
     <file name="syslink_dl.h"/>
@@ -17,7 +17,7 @@
 
   <makefile target="!fbw|sim|nps|hitl">
     <configure name="SYSLINK_PORT" default="uart6" case="upper|lower"/>
-    <configure name="SYSLINK_BAUD" default="B1000000" case="upper|lower"/>
+    <configure name="SYSLINK_BAUD" default="B3000000" case="upper|lower"/>
     <define name="SYSLINK_DEV" value="$(SYSLINK_PORT_LOWER)"/>
     <define name="USE_$(SYSLINK_PORT_UPPER)"/>
     <define name="$(SYSLINK_PORT_UPPER)_BAUD" value="$(SYSLINK_BAUD)"/>

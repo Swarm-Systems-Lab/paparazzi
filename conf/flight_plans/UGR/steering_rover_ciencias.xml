@@ -1,0 +1,42 @@
+<!DOCTYPE flight_plan SYSTEM "../flight_plan.dtd">
+
+<flight_plan alt="664" ground_alt="664" lat0="37.18253816" lon0="-3.60902591" max_dist_from_home="100" name="Rover Steering" security_height="0.3">
+  <header>
+
+</header>
+  <waypoints>
+    <waypoint name="HOME" x="0" y="0"/>
+    <waypoint name="STDBY" lat="37.18254944" lon="-3.60892416"/>
+  </waypoints>
+
+  <variables>
+    <variable var="stb_rad" init="8" min="0" max="30" step="1"/>
+  </variables>
+
+  <blocks>
+    <block name="Wait GPS" strip_icon="gps.png">
+      <call_once fun="NavKillThrottle()"/>
+      <while cond="!GpsFixValid()"/>
+    </block>
+    
+    <block name="Geo init" strip_icon="googleearth.png">
+      <while cond="LessThan(NavBlockTime(), 10)"/>
+      <!--call_once fun="NavSetGroundReferenceHere()"/-->
+      <!--call_once fun="NavSetAltitudeReferenceHere()"/-->
+    </block>
+    
+    <block name="Start Engine" strip_icon="on.png">
+      <while cond="LessThan(NavBlockTime(), 1)"/>
+      <call_once fun="autopilot_set_motors_on(TRUE)"/>
+    </block>
+
+    <block group="home" key="h" name="Standby" strip_button="Standby" strip_icon="home.png">
+      <call fun="gvf_ellipse_wp(WP_STDBY, stb_rad, stb_rad, 0)"/>
+    </block>
+    
+    <block name="GVF_ellipse" strip_icon="oval.png">
+      <call fun="gvf_ellipse_wp(WP_STDBY, gvf_ellipse_par.a, gvf_ellipse_par.b, 0)"/>
+    </block>
+    
+  </blocks>
+</flight_plan>

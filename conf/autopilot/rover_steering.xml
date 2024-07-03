@@ -51,7 +51,7 @@
 
     <!-- Cruiser: Speed ctrl (from state speed on enter) + Heading from RC -->
     <mode name="CRUISER">
-      <select cond="RCMode1() || (RCMode0() && RCCruiseMode1())"/>
+      <select cond="(RCMode1() || RCMode0()) && RCCruiseMode1()"/>
       <on_enter>
         <call fun="guidance_control.cmd.speed = stateGetHorizontalSpeedNorm_f()"/>
       </on_enter>
@@ -72,7 +72,7 @@
     
     <!-- Assisted: RC manul throttle + Heading ctrl (from GCS & flight plans) -->
     <mode name="ASSISTED">
-      <select cond="RCMode2() && RCCruiseMode0()" exception="HOME"/>
+      <select cond="(RCMode1() || RCMode2()) && RCCruiseMode0()" exception="HOME"/>
       <on_enter>
         <call fun="rover_guidance_steering_pid_reset()"/>
       </on_enter>

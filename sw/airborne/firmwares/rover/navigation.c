@@ -321,10 +321,10 @@ void nav_register_circle(nav_rover_circle nav_circle)
   nav.nav_circle = nav_circle;
 }
 
-void nav_register_oval(nav_rover_oval_init nav_oval_init, nav_rover_oval nav_oval)
+void nav_register_oval(nav_rover_oval_init nav_oval_init_, nav_rover_oval nav_oval_)
 {
-  nav.nav_oval_init = nav_oval_init;
-  nav.nav_oval = nav_oval;
+  nav.nav_oval_init = nav_oval_init_;
+  nav.nav_oval = nav_oval_;
 }
 
 

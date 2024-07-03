@@ -31,12 +31,17 @@
 
 // Default class K function constant
 #ifndef CBF_GAMMA
-#define CBF_GAMMA 1
+#define CBF_GAMMA 0.1
 #endif
 
 // Default maximum absolute value of omega_safe
 #ifndef CBF_OMEGA_SAFE_MAX
 #define CBF_OMEGA_SAFE_MAX 5
+#endif
+
+// 
+#ifndef CBF_OMEGA_THRESHOLD
+#define CBF_OMEGA_THRESHOLD 0
 #endif
 
 // Default timeout (ms) to discard the neighborn state
@@ -49,8 +54,14 @@
 #define CBF_BROADTIME 200
 #endif
 
+// Default CBF status
+#ifndef CBF_STATUS
+#define CBF_STATUS 0
+#endif
+
+
 /* Global variables inicialization ------------------------------------ */
-struct cbf_param cbf_params = {CBF_R, CBF_GAMMA, CBF_OMEGA_SAFE_MAX, CBF_TIMEOUT, CBF_BROADTIME};
+struct cbf_param cbf_params = {CBF_R, CBF_GAMMA, CBF_OMEGA_SAFE_MAX, CBF_OMEGA_THRESHOLD, CBF_TIMEOUT, CBF_BROADTIME, CBF_STATUS};
 struct cbf_con cbf_control = {0};
 struct cbf_tel cbf_telemetry;
 
@@ -72,9 +83,11 @@ static void send_cbf(struct transport_tx *trans, struct link_device *dev)
 
   pprz_msg_send_CBF(trans, dev, AC_ID, &cbf_control.omega_safe, n, cbf_telemetry.acs_id, 
                     n, cbf_telemetry.acs_available, n, cbf_telemetry.acs_timeslost,
-                    n, cbf_telemetry.uref, n, cbf_telemetry.px_rel, n, cbf_telemetry.py_rel,
-                    n, cbf_telemetry.vx_rel, n, cbf_telemetry.vy_rel, n, cbf_telemetry.h_ref,
-                    n, cbf_telemetry.h_dot_ref, n, cbf_telemetry.psi_ref);
+                    n, cbf_telemetry.uref, n, cbf_telemetry.prel_norm, 
+                    // n, cbf_telemetry.px_rel, n, cbf_telemetry.py_rel,
+                    // n, cbf_telemetry.vx_rel, n, cbf_telemetry.vy_rel, 
+                    n, cbf_telemetry.h_ref, n, cbf_telemetry.h_dot_ref, 
+                    n, cbf_telemetry.psi_ref);
 }
 
 #endif // PERIODIC TELEMETRY
@@ -85,9 +98,9 @@ static void cbf_low_level_getState(void)
   cbf_ac_state.y = stateGetPositionEnu_f()->y;
   cbf_ac_state.speed = stateGetHorizontalSpeedNorm_f();
   #if defined(FIXEDWING_FIRMWARE)
-    gvf_state.course = 90 - stateGetHorizontalSpeedDir_f();      // ENU course
-    gvf_state.vx = cbf_ac_state.speed * sinf(gvf_state.course);
-    gvf_state.vy = cbf_ac_state.speed * cosf(gvf_state.course);
+    cbf_ac_state.course = 90 - stateGetHorizontalSpeedDir_f(); // ENU course
+    cbf_ac_state.vx = stateGetSpeedEnu_f()->x;
+    cbf_ac_state.vy = stateGetSpeedEnu_f()->y;
     
   #elif defined(ROVER_FIRMWARE)
     // We assume that the course and psi
@@ -132,7 +145,8 @@ static void send_cbf_state_to_nei(void)
       msg.sender_id = AC_ID;
       msg.receiver_id = cbf_obs_tables[i].ac_id;
       msg.component_id = 0;
-      // The information sendt is redundant
+      
+      // The information sended is redundant
       pprzlink_msg_send_CBF_STATE(&msg, &cbf_ac_state.x, &cbf_ac_state.y, 
                                         &cbf_ac_state.vx, &cbf_ac_state.vy, 
                                         &cbf_ac_state.speed, &cbf_ac_state.course,
@@ -163,10 +177,19 @@ void cbf_init(void)
   #endif // PERIODIC_TELEMETRY
 }
 
+void cbf_on(void) 
+{
+  cbf_params.status = true;
+} 
+
+void cbf_off(void) 
+{
+  cbf_params.status = false;
+} 
+
 void cbf_run(float u_ref, int8_t s) 
 { 
-  /* Set AC u_ref */
-  cbf_ac_state.uref = -u_ref;
+  u_ref = -u_ref;
 
   /* Get the AC state*/
   cbf_low_level_getState();
@@ -177,27 +200,27 @@ void cbf_run(float u_ref, int8_t s)
   /* Run CBF, one time for each possible neighborn */
   uint32_t now = get_sys_time_msec();
 
-  float omega_safe = 0.0;
-  for (uint8_t j = 0; j < CBF_MAX_NEIGHBORS; ++j)  {
+  for (uint8_t i = 0; i < CBF_MAX_NEIGHBORS; ++i)  {
 
-    if (cbf_obs_tables[j].available == 0) { continue; } // ignore unavailable neighborns
+    if (cbf_obs_tables[i].available == 0) { continue; } // ignore unavailable neighborns
 
-    uint32_t timeout = now - cbf_obs_tables[j].t_last_msg;
+    uint32_t timeout = now - cbf_obs_tables[i].t_last_msg;
 
     if (timeout > cbf_params.timeout) { // ignore died neighborns 
-      cbf_obs_tables[j].available = 0;
-      cbf_telemetry.acs_timeslost[j] = cbf_telemetry.acs_timeslost[j] + 1;
+      cbf_obs_tables[i].available = 0;
+      cbf_telemetry.acs_timeslost[i] = cbf_telemetry.acs_timeslost[i] + 1;
+      cbf_obs_tables[i].omega_safe = 0;
       continue;
       } 
 
-    float cs_j = cosf(cbf_obs_tables[j].state.course);
-    float sn_j = sinf(cbf_obs_tables[j].state.course);
+    float cs_j = cosf(cbf_obs_tables[i].state.course);
+    float sn_j = sinf(cbf_obs_tables[i].state.course);
 
     /* CBF algorithm */
-    float px_rel = cbf_obs_tables[j].state.x - cbf_ac_state.x;
-    float py_rel = cbf_obs_tables[j].state.y - cbf_ac_state.y;
-    float vx_rel = (cbf_obs_tables[j].state.vx - cbf_ac_state.vx);
-    float vy_rel = (cbf_obs_tables[j].state.vy - cbf_ac_state.vy);
+    float px_rel = cbf_obs_tables[i].state.x - cbf_ac_state.x;
+    float py_rel = cbf_obs_tables[i].state.y - cbf_ac_state.y;
+    float vx_rel = (cbf_obs_tables[i].state.vx - cbf_ac_state.vx);
+    float vy_rel = (cbf_obs_tables[i].state.vy - cbf_ac_state.vy);
 
     float p_rel_sqr = px_rel*px_rel + py_rel*py_rel;
     float p_rel_norm = sqrt(p_rel_sqr);
@@ -205,29 +228,54 @@ void cbf_run(float u_ref, int8_t s)
     float v_rel_sqr = vx_rel*vx_rel + vy_rel*vy_rel;
     float v_rel_norm = sqrt(v_rel_sqr);
     
-    // Initialise the variables to be observed
+    if (ABS(v_rel_norm) < 0.001) { // Avoid NAN
+      cbf_obs_tables[i].omega_safe = 0;
+      continue;
+    }
+
+    // Heading angular velocity of the neighbor "i"
+    float u_ref_j = 0;
+    if (s == 1) {
+      u_ref_j = cbf_params.omega_threshold;
+      if (cbf_telemetry.uref[i] < u_ref_j){
+        u_ref_j = cbf_telemetry.uref[i];
+      }
+    }
+    else {
+      u_ref_j = -cbf_params.omega_threshold;
+      if (cbf_telemetry.uref[i] > u_ref_j){
+        u_ref_j = cbf_telemetry.uref[i];
+      }
+    }
+
+    // Initialise the telemetry variables
     float h_ref = 0;
     float h_dot_ref = 0;
     float psi = 0;
 
+    float omega_safe_i = 0;
     if (p_rel_norm  > cbf_params.r) { // if they have not collided...
       
       // cos(phi) y ||p_rel|| * cos(phi)
       float ch_phi = sqrt(p_rel_sqr - cbf_params.r*cbf_params.r) / p_rel_norm;
       float p_rel_phi = p_rel_norm * ch_phi;
 
+      if (ABS(p_rel_phi) < 0.001) { // Avoid NAN
+        cbf_obs_tables[i].omega_safe = 0;
+        continue;
+      }
+
       // v_rel_dot
       float vx_rel_dot1 = cbf_ac_state.speed * (-sn_i);
       float vy_rel_dot1 = cbf_ac_state.speed * ( cs_i);
-      float vx_rel_dot2 = cbf_obs_tables[j].state.speed * ( sn_j);
-      float vy_rel_dot2 = cbf_obs_tables[j].state.speed * (-cs_j);
+      float vx_rel_dot2 = cbf_obs_tables[i].state.speed * ( sn_j);
+      float vy_rel_dot2 = cbf_obs_tables[i].state.speed * (-cs_j);
 
-      float vx_rel_dot_ref = vx_rel_dot2 * cbf_obs_tables[j].state.uref + 
-                              vx_rel_dot1 * cbf_ac_state.uref;
+      float vx_rel_dot_ref = vx_rel_dot2 * u_ref_j + 
+                              vx_rel_dot1 * u_ref;
 
-      float vy_rel_dot_ref = vy_rel_dot2 * cbf_obs_tables[j].state.uref + 
-                              vy_rel_dot1 * cbf_ac_state.uref;
-
+      float vy_rel_dot_ref = vy_rel_dot2 * u_ref_j + 
+                              vy_rel_dot1 * u_ref;
 
       // h(x,t)
       float dot_rel = px_rel * vx_rel + py_rel * vy_rel;    // <p_rel, v_rel>
@@ -256,33 +304,55 @@ void cbf_run(float u_ref, int8_t s)
           float psi_lgh = psi / Lgh;
           
           if (s == 1) {
-            if (psi_lgh > 0) {omega_safe = Max(omega_safe, psi_lgh);}
+            if (psi_lgh > 0) {omega_safe_i = psi_lgh;}
           }
           else {
-            if (psi_lgh < 0) {omega_safe = Min(omega_safe, psi_lgh);}
+            if (psi_lgh < 0) {omega_safe_i = psi_lgh;}
           }
             
-          omega_safe = BoundOmega(omega_safe);
+          omega_safe_i = BoundOmega(omega_safe_i);
         }
       }
     }
 
+    cbf_obs_tables[i].omega_safe = omega_safe_i;
+
     // Telemetry variables -----
-    cbf_telemetry.uref[j]      = cbf_obs_tables[j].state.uref;
-    cbf_telemetry.px_rel[j]    = px_rel;
-    cbf_telemetry.py_rel[j]    = py_rel;
-    cbf_telemetry.vx_rel[j]    = vx_rel;
-    cbf_telemetry.vy_rel[j]    = vy_rel;
-    cbf_telemetry.h_ref[j]     = h_ref;
-    cbf_telemetry.h_dot_ref[j] = h_dot_ref;
-    cbf_telemetry.psi_ref[j]   = psi;
+    cbf_telemetry.uref[i]      = cbf_obs_tables[i].state.uref;
+    cbf_telemetry.prel_norm[i] = p_rel_norm;
+    cbf_telemetry.px_rel[i]    = px_rel;
+    cbf_telemetry.py_rel[i]    = py_rel;
+    cbf_telemetry.vx_rel[i]    = vx_rel;
+    cbf_telemetry.vy_rel[i]    = vy_rel;
+    cbf_telemetry.h_ref[i]     = h_ref;
+    cbf_telemetry.h_dot_ref[i] = h_dot_ref;
+    cbf_telemetry.psi_ref[i]   = psi;
     // -------------------------
   }
 
-  // Send to the guidance the final omega_safe
+  // Send the maximum omega_safe to the external modules (guidance, nav...)
+  float omega_safe = 0.0;
+  for (uint8_t i = 0; i < CBF_MAX_NEIGHBORS; ++i) {
+    if (cbf_obs_tables[i].available) {
+        if (s == 1) {
+          omega_safe = Max(omega_safe, cbf_obs_tables[i].omega_safe);
+        }
+        else {
+          omega_safe = Min(omega_safe, cbf_obs_tables[i].omega_safe);
+        }
+    }
+  }
   cbf_control.omega_safe = omega_safe;
 
-  // Transmit my CBF state to every AC in CBF_NEI_AC_IDS
+  // Set the new AC u_ref to share with neighbors
+  if (cbf_params.status) {
+    cbf_ac_state.uref = u_ref - cbf_control.omega_safe;
+  }
+  else {
+    cbf_ac_state.uref = u_ref;
+  }
+
+  // Send my CBF state to every AC in CBF_NEI_AC_IDS
   if ((now - cbf_control.last_transmision) > cbf_params.broadtime) {
     send_cbf_state_to_nei();
     cbf_control.last_transmision = now;

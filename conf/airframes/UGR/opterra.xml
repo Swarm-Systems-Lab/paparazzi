@@ -18,8 +18,8 @@
     <target name="nps" board="pc">
       <module name="radio_control" type="ppm"/>
       <module name="fdm" type="jsbsim"/>
-      <configure name="MODEM_PORT_OUT" value="4246"/>
-      <configure name="MODEM_PORT_IN" value="4247"/>
+      <configure name="MODEM_PORT_IN" value="4252"/>
+      <configure name="MODEM_PORT_OUT" value="4253"/>
     </target>
 
     <module name="telemetry" type="xbee_api"/>
@@ -42,6 +42,9 @@
       <define name="GPS_UBX_BOOTRESET" value="3"/>
     </module>
     
+    <module name="cbf">
+      <define name="CBF_NEI_AC_IDS" value="{5,6}"/>
+    </module>
   </firmware>
 
   <servos>
@@ -76,9 +79,16 @@
   </command_laws>
 
   <section name="GVF" prefix="GVF_">
-    <define name="LINE_KE" value="2.5"/>
     <define name="ELLIPSE_KE" value="0.8"/>
     <define name="ELLIPSE_KN" value="0.6"/>
+    <define name="ELLIPSE_A" value="100"/>
+    <define name="ELLIPSE_B" value="100"/>
+  </section>
+
+  <section name="CBF" prefix="CBF_">
+    <define name="R" value="5"/>
+    <define name="GAMMA" value="0.7"/>
+    <define name="OMEGA_THRESHOLD" value="-0.2"/>
   </section>
 
   <section name="GVF_PARAMETRIC" prefix="GVF_PARAMETRIC_">
@@ -129,7 +139,7 @@
   </section>
 
   <section name="BAT">
-    <define name="CATASTROPHIC_BAT_LEVEL" value="8.6" unit="V"/>
+    <define name="CATASTROPHIC_BAT_LEVEL" value="11.5" unit="V"/>
     <define name="MilliAmpereOfAdc(_adc)" value="(_adc-632)*4.14"/>
   </section>
 
@@ -165,11 +175,11 @@
     <define name="AUTO_THROTTLE_CLIMB_THROTTLE_INCREMENT" value="0.07" unit="%/(m/s)"/>
     <define name="AUTO_THROTTLE_PGAIN" value="0.012"/>
     <define name="AUTO_THROTTLE_DGAIN" value="0.000"/>
-    <define name="AUTO_THROTTLE_IGAIN" value="0.011"/>
+    <define name="AUTO_THROTTLE_IGAIN" value="0.004"/>
     <define name="AUTO_THROTTLE_PITCH_OF_VZ_PGAIN" value="0.1"/>
 
     <!-- Climb loop (pitch) -->
-    <define name="AUTO_PITCH_PGAIN" value="0.03"/>
+    <define name="AUTO_PITCH_PGAIN" value="0.048"/>
     <define name="AUTO_PITCH_DGAIN" value="0.01"/>
     <define name="AUTO_PITCH_IGAIN" value="0.0"/>
     <define name="AUTO_PITCH_MAX_PITCH" value="20" unit="deg"/>
@@ -206,41 +216,23 @@
 
   <section name="HORIZONTAL CONTROL" prefix="H_CTL_">
     <define name="COURSE_PGAIN" value="0.743"/>
-    <!--XPA NOT USED />
-    <define name="COURSE_TAU" value="0.5"/-->
+    
     <define name="ROLL_MAX_SETPOINT" value="40." unit="deg"/>
+    <define name="ROLL_MIN_SETPOINT" value="-40." unit="deg"/>
     <define name="PITCH_MAX_SETPOINT" value="30." unit="deg"/>
     <define name="PITCH_MIN_SETPOINT" value="-30." unit="deg"/>
 
     <define name="ROLL_ATTITUDE_GAIN" value="11000."/>
     <define name="ROLL_RATE_GAIN" value="1000."/>
     <define name="ROLL_IGAIN" value="100."/>
-    <!--XPA NOT USED />
-    <define name="ROLL_KFFA" value="0"/>
-    <define name="ROLL_KFFD" value="0"/-->
 
     <define name="PITCH_PGAIN" value="17250"/>
     <define name="PITCH_DGAIN" value="500."/>
     <define name="PITCH_IGAIN" value="400"/>
 
-    <!--XPA NOT USED />
-    <define name="PITCH_KFFA" value="0."/>
-    <define name="PITCH_KFFD" value="0."/-->
-
     <define name="PITCH_OF_ROLL" value="1." unit="deg"/>
     <define name="AILERON_OF_THROTTLE" value="0.0"/>
     <define name="ELEVATOR_OF_ROLL" value="0"/>
-  </section>
-
-  <!--XPA NOT USED />
-  <section name="NAV">
-    <define name="NAV_GLIDE_PITCH_TRIM" value="0"/>
-  </section-->
-
-  <section name="CATAPULT" prefix="NAV_CATAPULT_">
-    <define name="ACCELERATION_THRESHOLD" value="1.0"/>
-    <define name="INITIAL_PITCH" value="20" unit="deg"/>
-    <define name="CLIMB_DISTANCE" value="160"/>
   </section>
 
   <section name="FAILSAFE" prefix="FAILSAFE_">
@@ -256,7 +248,7 @@
     <define name="JSBSIM_MODEL" value="easystar" type="string"/>
     <define name="SENSORS_PARAMS" value="nps_sensors_params_default.h" type="string"/>
   </section>
-  
+
   <section name="GCS">
     <define name="AC_ICON" value="flyingwing"/>
   </section>

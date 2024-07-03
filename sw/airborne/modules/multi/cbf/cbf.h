@@ -61,8 +61,10 @@ struct cbf_param {
   float r;
   float gamma;
   float omega_safe_max;
+  float omega_threshold;;
   float timeout;
   float broadtime;
+  bool status;
 };
 
 // CBF control
@@ -79,6 +81,7 @@ struct cbf_tel {
   uint16_t acs_timeslost[CBF_MAX_NEIGHBORS];
 
   float uref[CBF_MAX_NEIGHBORS];
+  float prel_norm[CBF_MAX_NEIGHBORS];
   float px_rel[CBF_MAX_NEIGHBORS];
   float py_rel[CBF_MAX_NEIGHBORS];
   float vx_rel[CBF_MAX_NEIGHBORS];
@@ -104,6 +107,7 @@ typedef struct{
   uint16_t ac_id;
   cbf_state_t state;
   
+  float omega_safe;
   bool available;
   uint32_t t_last_msg;
 } cbf_tab_entrie_t;
@@ -118,7 +122,11 @@ extern cbf_tab_entrie_t cbf_obs_tables[CBF_MAX_NEIGHBORS];
 /* External functions */
 
 extern void cbf_init(void);
+extern void cbf_on(void);
+extern void cbf_off(void);
 extern void cbf_run(float u_ref, int8_t s);
 extern void parse_CBF_STATE(uint8_t *buf);
+
+
 
 #endif // CBF_H

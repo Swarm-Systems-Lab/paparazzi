@@ -27,8 +27,6 @@
  *
  */
 
-#include "firmwares/fixedwing/nav.h"
-#include "state.h"
 #include "autopilot.h"
 #include "generated/flight_plan.h"
 #include "modules/guidance/gvf/gvf.h"
@@ -78,11 +76,17 @@ static bool gvf_intercept_two_lines(struct FloatVect2 *p, struct FloatVect2 x, s
 static bool gvf_get_two_intersects(struct FloatVect2 *x, struct FloatVect2 *y, struct FloatVect2 a, struct FloatVect2 b)
 {
   int i, count = 0;
-  struct FloatVect2 tmp;
+  struct FloatVect2 tmp, waypoint_start, waypoint_end;
 
-  for (i = 0; i < gvf_survey.poly_count - 1; i++)
-    if (gvf_intercept_two_lines(&tmp, a, b, waypoints[gvf_survey.poly_first + i].x, waypoints[gvf_survey.poly_first + i].y,
-                                waypoints[gvf_survey.poly_first + i + 1].x, waypoints[gvf_survey.poly_first + i + 1].y)) {
+  
+
+  for (i = 0; i < gvf_survey.poly_count - 1; i++) {
+    waypoint_start.x = WaypointX(gvf_survey.poly_first + i);
+    waypoint_start.y = WaypointY(gvf_survey.poly_first + i);
+    waypoint_end.x = WaypointX(gvf_survey.poly_first + i + 1);
+    waypoint_end.y = WaypointY(gvf_survey.poly_first + i + 1);
+
+    if (gvf_intercept_two_lines(&tmp, a, b, waypoint_start.x, waypoint_start.y, waypoint_end.x, waypoint_end.y)) {
       if (count == 0) {
         *x = tmp;
         count++;
@@ -92,12 +96,16 @@ static bool gvf_get_two_intersects(struct FloatVect2 *x, struct FloatVect2 *y, s
         break;
       }
     }
+  }
 
-  //wrapover first,last polygon waypoint
+  // wrapover first,last polygon waypoint
+  waypoint_start.x = WaypointX(gvf_survey.poly_first + gvf_survey.poly_count - 1);
+  waypoint_start.y = WaypointY(gvf_survey.poly_first + gvf_survey.poly_count - 1);
+  waypoint_end.x = WaypointX(gvf_survey.poly_first);
+  waypoint_end.y = WaypointY(gvf_survey.poly_first);
+
   if (count == 1
-      && gvf_intercept_two_lines(&tmp, a, b, waypoints[gvf_survey.poly_first + gvf_survey.poly_count - 1].x,
-                                 waypoints[gvf_survey.poly_first + gvf_survey.poly_count - 1].y, waypoints[gvf_survey.poly_first].x,
-                                 waypoints[gvf_survey.poly_first].y)) {
+      && gvf_intercept_two_lines(&tmp, a, b, waypoint_start.x, waypoint_start.y, waypoint_end.x, waypoint_end.y)) {
     *y = tmp;
     count++;
   }
@@ -136,7 +144,7 @@ void gvf_nav_survey_polygon_setup(uint8_t first_wp, uint8_t size, float angle, f
                                   float min_rad, float altitude)
 {
   int i;
-  struct FloatVect2 small, sweep;
+  struct FloatVect2 small, sweep, waypoint;
   float divider, angle_rad = angle / 180.0 * M_PI;
 
   if (angle < 0.0) { angle += 360.0; }
@@ -153,7 +161,7 @@ void gvf_nav_survey_polygon_setup(uint8_t first_wp, uint8_t size, float angle, f
   gvf_survey.segment_angle = angle;
   gvf_survey.return_angle = angle + 180;
   if (gvf_survey.return_angle > 359) { gvf_survey.return_angle -= 360; }
-
+  
   if (angle <= 45.0 || angle >= 315.0) {
     //north
     gvf_survey.dir_vec.y = 1.0;
@@ -187,23 +195,29 @@ void gvf_nav_survey_polygon_setup(uint8_t first_wp, uint8_t size, float angle, f
   VECT2_SMUL(gvf_survey.sweep_vec, sweep, gvf_survey.psa_sweep_width);
 
   //begin at leftmost position (relative to gvf_survey.dir_vec)
-  VECT2_COPY(small, waypoints[gvf_survey.poly_first]);
+  waypoint.x = WaypointX(gvf_survey.poly_first);
+  waypoint.y = WaypointY(gvf_survey.poly_first);
+  VECT2_COPY(small, waypoint);
 
   divider = (gvf_survey.sweep_vec.y * gvf_survey.dir_vec.x) - (gvf_survey.sweep_vec.x * gvf_survey.dir_vec.y);
 
   //calculate the leftmost point if one sees the dir vec as going "up" and the sweep vec as going right
   if (divider < 0.0) {
     for (i = 1; i < gvf_survey.poly_count; i++) {
-      if ((gvf_survey.dir_vec.x * (waypoints[gvf_survey.poly_first + i].y - small.y)) + (gvf_survey.dir_vec.y *
-          (small.x - waypoints[gvf_survey.poly_first + i].x)) > 0.0) {
-        VECT2_COPY(small, waypoints[gvf_survey.poly_first + i]);
+      waypoint.x = WaypointX(gvf_survey.poly_first + i);
+      waypoint.y = WaypointY(gvf_survey.poly_first + i);
+
+      if ((gvf_survey.dir_vec.x * (waypoint.y - small.y)) + (gvf_survey.dir_vec.y * (small.x - waypoint.x)) > 0.0) {
+        VECT2_COPY(small, waypoint);
       }
     }
   } else {
     for (i = 1; i < gvf_survey.poly_count; i++) {
-      if ((gvf_survey.dir_vec.x * (waypoints[gvf_survey.poly_first + i].y - small.y)) + (gvf_survey.dir_vec.y *
-          (small.x - waypoints[gvf_survey.poly_first + i].x)) > 0.0) {
-        VECT2_COPY(small, waypoints[gvf_survey.poly_first + i]);
+      waypoint.x = WaypointX(gvf_survey.poly_first + i);
+      waypoint.y = WaypointY(gvf_survey.poly_first + i);
+
+      if ((gvf_survey.dir_vec.x * (waypoint.y - small.y)) + (gvf_survey.dir_vec.y * (small.x - waypoint.x)) > 0.0) {
+        VECT2_COPY(small, waypoint);
       }
     }
   }
@@ -221,9 +235,11 @@ void gvf_nav_survey_polygon_setup(uint8_t first_wp, uint8_t size, float angle, f
   //center of the entry circle
   VECT2_DIFF(gvf_survey.entry_center, gvf_survey.seg_start, gvf_survey.rad_vec);
 
+#ifndef ROVER_FIRMWARE
   //fast climbing to desired altitude
   NavVerticalAutoThrottleMode(0.0);
   NavVerticalAltitudeMode(gvf_survey.psa_altitude, 0.0);
+#endif
 
   gvf_survey.stage = gENTRY;
 }
@@ -244,15 +260,24 @@ void gvf_nav_direction_circle(float rad)
 
 bool gvf_nav_survey_polygon_run(void)
 {
+#ifndef ROVER_FIRMWARE
   NavVerticalAutoThrottleMode(0.0);
   NavVerticalAltitudeMode(gvf_survey.psa_altitude, 0.0);
+#else
+  // Bypass the altitude condition if using the rover firmware
+  gvf_survey.psa_altitude = stateGetPositionUtm_f()->alt;
+#endif
 
   //entry circle around entry-center until the desired altitude is reached
   if (gvf_survey.stage == gENTRY) {
+
     gvf_nav_direction_circle(gvf_survey.psa_min_rad);
     gvf_ellipse_XY(gvf_survey.entry_center.x, gvf_survey.entry_center.y, gvf_survey.psa_min_rad, gvf_survey.psa_min_rad, 0);
+    
+    gvf_low_level_getState();
+
     if (NavCourseCloseTo(gvf_survey.segment_angle)
-        && nav_approaching_xy(gvf_survey.seg_start.x, gvf_survey.seg_start.y, last_x, last_y, CARROT)
+        && gvf_nav_approaching(gvf_survey.seg_start.x, gvf_survey.seg_start.y, gvf_state.px, gvf_state.py, 4)
         && fabs(stateGetPositionUtm_f()->alt - gvf_survey.psa_altitude) <= 20) {
       gvf_survey.stage = gSEG;
       nav_init_stage();
@@ -266,7 +291,7 @@ bool gvf_nav_survey_polygon_run(void)
   if (gvf_survey.stage == gSEG) {
     gvf_nav_points(gvf_survey.seg_start, gvf_survey.seg_end);
     //calculate all needed points for the next flyover
-    if (nav_approaching_xy(gvf_survey.seg_end.x, gvf_survey.seg_end.y, gvf_survey.seg_start.x, gvf_survey.seg_start.y, 0)) {
+    if (gvf_nav_approaching(gvf_survey.seg_end.x, gvf_survey.seg_end.y, gvf_survey.seg_start.x, gvf_survey.seg_start.y, 0)) {
 #ifdef DIGITAL_CAM
       dc_stop();
 #endif
@@ -304,7 +329,7 @@ bool gvf_nav_survey_polygon_run(void)
     //return
   } else if (gvf_survey.stage == gRET) {
     gvf_nav_points(gvf_survey.ret_start, gvf_survey.ret_end);
-    if (nav_approaching_xy(gvf_survey.ret_end.x, gvf_survey.ret_end.y, gvf_survey.ret_start.x, gvf_survey.ret_start.y, 0)) {
+    if (gvf_nav_approaching(gvf_survey.ret_end.x, gvf_survey.ret_end.y, gvf_survey.ret_start.x, gvf_survey.ret_start.y, 0)) {
       gvf_survey.stage = gTURN2;
       nav_init_stage();
     }

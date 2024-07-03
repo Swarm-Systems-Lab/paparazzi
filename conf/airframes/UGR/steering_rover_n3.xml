@@ -50,7 +50,12 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
       <define name="GVF_OCAML_GCS" value="FALSE"/>
     </module>
     
-    <module name="distributed_circular_formation"/>
+    <!-- Guidance modules -->
+    <module name="gvf_module">
+      <define name="OCAML_GCS" value="FALSE"/>
+    </module>
+    
+    <!--module name="distributed_circular_formation"/-->
     <module name="cbf">
       <define name="CBF_NEI_AC_IDS" value="{1,2}"/>
     </module>
@@ -129,9 +134,19 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
   <section name="GVF" prefix="GVF_">
     <define name="ELLIPSE_KE" value="1.5"/>
     <define name="ELLIPSE_KN" value="1.5"/>
-    <define name="ELLIPSE_A" value="5"/>
-    <define name="ELLIPSE_B" value="5"/>
+    <define name="ELLIPSE_A" value="10"/>
+    <define name="ELLIPSE_B" value="10"/>
     <define name="ELLIPSE_ALPHA" value="0"/>
+    
+    <define name="LINE_KE" value="10"/>
+    <define name="LINE_KN" value="2"/>
+  </section>
+  
+  <section name="CBF" prefix="CBF_">
+    <define name="R" value="2"/>
+    <define name="GAMMA" value="0.45"/>
+    <define name="OMEGA_SAFE_MAX" value="1"/>
+    <define name="OMEGA_THRESHOLD" value="-0.2"/>
   </section>
   
   <!-- LiPo 3300mA 7.4V 2S1P CELL (Soaring)-->

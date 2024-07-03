@@ -50,7 +50,8 @@
 
 // Low level control functions
 extern void gvf_low_level_getState(void);
-extern void gvf_low_level_control_2D(float);
+extern void gvf_low_level_control_2D(float omega);
+extern bool gvf_nav_approaching(float wp_x, float wp_y, float from_x, float from_y, float t);
 
 #endif // GVF_LOW_LEVEL_CONTROL_H
 

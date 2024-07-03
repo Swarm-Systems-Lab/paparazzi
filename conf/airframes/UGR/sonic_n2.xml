@@ -32,8 +32,8 @@
     <target name="nps" board="pc">
       <module name="radio_control" type="ppm"/>
       <module name="fdm" type="jsbsim"/>
-      <configure name="MODEM_PORT_OUT" value="4250"/>
-      <configure name="MODEM_PORT_IN" value="4251"/>
+      <configure name="MODEM_PORT_IN" value="4250"/>
+      <configure name="MODEM_PORT_OUT" value="4251"/>
     </target>
 
     <module name="telemetry" type="xbee_api"/>
@@ -53,7 +53,6 @@
     <module name="navigation"/>
     <!--module name="takeoff_detect"/-->
 
-
     <module name="tlsf"/>
     <!--module name="sdlog"/>
     <module name="logger" type="sd_chibios"/>
@@ -64,12 +63,9 @@
       <configure name="GPS_BAUD" value="B38400"/>
     </module>
     
-    <!-- DGPS >
-    <define name="USE_GPS_UBX_RTCM" value="TRUE"/-->
-
-    <!--module name="current_sensor">
-      <configure name="ADC_CURRENT_SENSOR" value="ADC_1"/>
-    </module-->
+    <module name="cbf">
+      <define name="CBF_NEI_AC_IDS" value="{5,200}"/>
+    </module>
   </firmware>
 
   <servos>
@@ -224,7 +220,8 @@
     <define name="COURSE_PGAIN" value="0.743"/>
     <!--XPA NOT USED />
     <define name="COURSE_TAU" value="0.5"/-->
-    <define name="ROLL_MAX_SETPOINT" value="50.0000214859" unit="deg"/>
+    <define name="ROLL_MAX_SETPOINT" value="30." unit="deg"/>
+    <define name="ROLL_MIN_SETPOINT" value="-30." unit="deg"/>
     <define name="PITCH_MAX_SETPOINT" value="30." unit="deg"/>
     <define name="PITCH_MIN_SETPOINT" value="-30." unit="deg"/>
 
@@ -276,14 +273,14 @@
   <section name="GVF" prefix="GVF_">
     <define name="ELLIPSE_KE" value="0.8"/>
     <define name="ELLIPSE_KN" value="0.6"/>
-    <define name="ELLIPSE_A" value="90"/>
-    <define name="ELLIPSE_B" value="90"/>
+    <define name="ELLIPSE_A" value="100"/>
+    <define name="ELLIPSE_B" value="100"/>
   </section>
-
-  <section name="GVF_PARAMETRIC" prefix="GVF_PARAMETRIC_">
-    <define name="3D_LISSAJOUS_KX" value="0.001"/>
-    <define name="3D_LISSAJOUS_KY" value="0.001"/>
-    <define name="3D_LISSAJOUS_KZ" value="0.001"/>
+  
+  <section name="CBF" prefix="CBF_">
+    <define name="R" value="5"/>
+    <define name="GAMMA" value="0.7"/>
+    <define name="OMEGA_THRESHOLD" value="-0.2"/>
   </section>
   
    <section name="GCS">

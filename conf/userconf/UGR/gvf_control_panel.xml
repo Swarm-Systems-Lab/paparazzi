@@ -192,6 +192,7 @@
       <program name="Simulator">
         <arg flag="-a" constant="gvf_opterra_12"/>
         <arg flag="-t" constant="nps"/>
+        <arg flag="--time_factor" constant="1"/>
       </program>
       <program name="Data Link">
         <arg flag="-udp"/>
@@ -204,18 +205,16 @@
       <program name="Simulator">
         <arg flag="-a" constant="gvf_sonic1"/>
         <arg flag="-t" constant="nps"/>
+        <arg flag="--time_factor" constant="1"/>
       </program>
       <program name="Simulator">
         <arg flag="-a" constant="gvf_sonic2"/>
         <arg flag="-t" constant="nps"/>
+        <arg flag="--time_factor" constant="1"/>
       </program>
+      <program name="Messages"/>
     </session>
     <session name="_Multi_sim_rover">
-      <program name="proxy_sim (Python)">
-        <arg flag="-ids" constant="1,2,3"/>
-        <arg flag="-pi" constant="4245,4247,4249"/>
-        <arg flag="-po" constant="4244,4246,4248"/>
-      </program>
       <program name="Data Link">
         <arg flag="-udp"/>
         <arg flag="-udp_broadcast"/>
@@ -227,15 +226,33 @@
       <program name="Simulator">
         <arg flag="-a" constant="st_rover_n1"/>
         <arg flag="-t" constant="nps"/>
+        <arg flag="--time_factor" constant="3"/>
       </program>
       <program name="Simulator">
         <arg flag="-a" constant="st_rover_n2"/>
         <arg flag="-t" constant="nps"/>
+        <arg flag="--time_factor" constant="3"/>
       </program>
       <program name="Simulator">
         <arg flag="-a" constant="st_rover_n3"/>
         <arg flag="-t" constant="nps"/>
+        <arg flag="--time_factor" constant="3"/>
       </program>
+      <program name="Messages"/>
+    </session>
+    <session name="Simulation Fast">
+      <program name="Simulator">
+        <arg flag="-a" constant="st_rover_n3"/>
+        <arg flag="-t" constant="nps"/>
+      </program>
+      <program name="Data Link">
+        <arg flag="-udp"/>
+        <arg flag="-udp_broadcast"/>
+      </program>
+      <program name="Server">
+        <arg flag="-n"/>
+      </program>
+      <program name="PprzGCS"/>
     </session>
   </section>
 </control_panel>

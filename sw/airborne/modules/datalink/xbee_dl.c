@@ -55,6 +55,31 @@ INFO("XBEE channel configured : " XBEE_CHANNEL_CONF)
 
 struct xbee_transport xbee_tp;
 
+// RSSI experiment -----------------------
+uint8_t rssi = 0;
+uint8_t tx_power = 0;
+
+#if PERIODIC_TELEMETRY
+#include "modules/datalink/telemetry.h"
+
+static void send_RSSI(struct transport_tx *trans __attribute__((unused)), struct link_device *dev __attribute__((unused)))
+{
+  struct pprzlink_msg msg;
+
+  msg.trans = &(DefaultChannel).trans_tx;
+  msg.dev = &(DefaultDevice).device;
+  msg.sender_id = AC_ID;
+  msg.receiver_id = 0;
+  msg.component_id = 0;
+
+  rssi = xbee_tp.rssi;
+  
+  pprzlink_msg_send_RSSI(&msg, &rssi, &rssi);
+}
+
+#endif // PERIODIC_TELEMETRY
+// ---------------------------------------
+
 void xbee_dl_init(void)
 {
 #if USE_HARD_FAULT_RECOVERY
@@ -64,6 +89,12 @@ void xbee_dl_init(void)
   else
 #endif
     xbee_transport_init(&xbee_tp, &((XBEE_UART).device), AC_ID, XBEE_TYPE, XBEE_BAUD, sys_time_usleep, CONCAT(XBEE_INIT, XBEE_CHANNEL_CONF));
+
+// RSSI experiment -----------------------
+#if PERIODIC_TELEMETRY
+  register_periodic_telemetry(DefaultPeriodic, PPRZ_MSG_ID_RSSI, send_RSSI);
+#endif
+// ---------------------------------------
 }
 
 void xbee_dl_event(void)

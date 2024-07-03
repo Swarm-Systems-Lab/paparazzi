@@ -55,6 +55,8 @@ typedef struct {
 extern gvf_con gvf_control;
 
 typedef struct {
+  float px;
+  float py;
   float course;
   float px_dot;
   float py_dot;

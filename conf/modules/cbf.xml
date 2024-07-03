@@ -3,17 +3,20 @@
 <module name="cbf" dir="multi/cbf">
   <doc>
     <description>Distributed collision avoidance algorithm based on Control Cone Barrier Functions (C3BF).
-    Currently, this module is designed for the steering rover dynamics.
+    Currently, this module works together with the GVF module.
     References: 
     - Introduction to Control Lyapunov Functions and Control Barrier Functions, https://youtu.be/_Tkn_Hzo4AA
     - Control Barrier Functions in UGVs for Kinematic Obstacle Avoidance: A Collision Cone Approach, https://arxiv.org/abs/2209.11524
+    - J Bautista, HG de Marina. Behavioral-based circular formation control for robot swarms, https://arxiv.org/pdf/2309.09101.pdf
     </description>
     <section name="Parameters" prefix="CBF_">
       <define name="R" value="1.0" description="Radius of the conservative circle around the agents (virtual obstacle)."/>
-      <define name="GAMMA" value="1.0" description="This constant will help the controller to avoid discontinuities."/>
+      <define name="GAMMA" value="0.1" description="Aggressiveness of the controler (lower value implies greater omega_safe and smother overtaking)."/>
       <define name="OMEGA_SAFE_MAX" value="1.0" description="Maximum value of the CBF control variable (omega_safe, in rad/s)."/>
-      <define name="TIMEOUT" value="1500" description="After this time (in ms) if we do not have any msg from a neighborh, we ignore it"/>
-      <define name="BROADTIME" value="200" description="Time (in ms) for transmiting the AC state to their neighbors"/>
+      <define name="CBF_OMEGA_THRESHOLD" value="0" description=""/>
+      <define name="TIMEOUT" value="1500" description="After this time (in ms), if we do not have any msg from a neighborh, we ignore it."/>
+      <define name="BROADTIME" value="200" description="Time (in ms) for transmiting the AC state to their neighbors."/>
+      <define name="STATUS" value="FALSE" description="If TRUE, the CBF controller is active."/>
     </section>
   </doc>
 
@@ -21,10 +24,12 @@
     <dl_settings>
       <dl_settings NAME="CBF">
         <dl_setting MAX="5" MIN="0" STEP="0.1" VAR="cbf_params.r" shortname = "CBF_radius" param="CBF_R"/>
-        <dl_setting MAX="10" MIN="0" STEP="0.1" VAR="cbf_params.gamma" shortname = "CBF_gamma" param="CBF_GAMMA"/>
-        <dl_setting MAX="20" MIN="0" STEP="0.1" VAR="cbf_params.omega_safe_max" shortname = "CBF_omegaSafeMax" param="CBF_OMEGA_SAFE_MAX"/>
+        <dl_setting MAX="20" MIN="0" STEP="0.001" VAR="cbf_params.gamma" shortname = "CBF_gamma" param="CBF_GAMMA"/>
+        <dl_setting MAX="5" MIN="0" STEP="0.01" VAR="cbf_params.omega_safe_max" shortname = "CBF_omegaSafeMax" param="CBF_OMEGA_SAFE_MAX"/>
+        <dl_setting MAX="5" MIN="-5" STEP="0.01" VAR="cbf_params.omega_threshold" shortname = "CBF_omegaThr" param="CBF_OMEGA_THRESHOLD"/>
         <dl_setting MAX="50000" MIN="10" STEP="10" VAR="cbf_params.timeout" shortname = "CBF_timeout" param="CBF_TIMEOUT"/>
         <dl_setting MAX="5000" MIN="10" STEP="10" VAR="cbf_params.broadtime" shortname = "CBF_broadtime" param="CBF_BROADTIME"/>
+        <dl_setting MAX="1" MIN="0" STEP="1" VAR="cbf_params.status" shortname = "CBF_status" param="CBF_STATUS" values="OFF|ON"/>
        </dl_settings>
     </dl_settings>
   </settings>
@@ -37,7 +42,7 @@
 
   <datalink message="CBF_STATE" fun="parse_CBF_STATE(buf)" class="telemetry"/>
 
-  <makefile firmware="rover">
+  <makefile>
     <file name="cbf.c"/>
   </makefile>
 
