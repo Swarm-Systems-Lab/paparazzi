@@ -1731,7 +1731,6 @@
       </description>
       <field name="bytes_received" type="uint8[]"/>
       <field name="msg_class"      type="uint8"/>
-      <field name="msg_len"        type="uint8"/>
       <field name="msg_decoded"    type="float"/>
       <field name="msg_count"      type="uint16"/>
       <field name="status"         type="uint8"/>

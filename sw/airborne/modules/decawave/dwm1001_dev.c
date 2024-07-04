@@ -85,8 +85,7 @@ float msg_decoded = 0;
 #if PERIODIC_TELEMETRY
 static void send_dwm1001_debug(struct transport_tx *trans, struct link_device *dev)
 {
-  uint8_t n = 40;
-  pprz_msg_send_DWM1001_DEBUG(trans, dev, AC_ID, n, dwm1001.msg_buff, &dwm1001.msg_class, &dwm1001.msg_len,
+  pprz_msg_send_DWM1001_DEBUG(trans, dev, AC_ID, dwm1001.msg_len, dwm1001.msg_buff, &dwm1001.msg_class,
                               &msg_decoded, &dwm1001.msg_cnt, &dwm1001.status, &dwm1001.error_last, 
                               &dwm1001.error_cnt);
 }
