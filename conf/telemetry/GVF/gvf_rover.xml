@@ -27,9 +27,10 @@
       <message name="GVF"                    period="1.0"/>
       <!--message name="DCF"                    period="1.0"/-->
       <message name="CBF"                    period="1.0"/>
+      <message name="DWM1001_DEBUG"          period="0.1"/>
     </mode>
     
-    <mode name="rssi" key_press="d">
+    <mode name="rssi">
       <message name="AUTOPILOT_VERSION"      period="11.1"/>
       <message name="ROVER_STATUS"           period="1.2"/>
       <message name="ROTORCRAFT_FP"          period="0.1"/>

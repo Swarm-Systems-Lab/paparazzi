@@ -1,11 +1,11 @@
 <!DOCTYPE module SYSTEM "module.dtd" >
 
-<module name = "dwm1001_dev" dir = "decawave" >
+<module name="decawave_dwm1001_dev" dir="decawave">
   <doc>
     <description>
       Decawave DWM1001-DEV Development Board module.
     </description >
-    <configure name="DECAWAVE_UART" value="UARTX" description="UART where the DWM1001-DEV is connected"/>
+    <configure name="DECAWAVE_UART" value="UARTX" description="UART Port where the DWM1001-DEV is connected"/>
     <configure name="DECAWAVE_BAUD" value="B115200" description="UART Baudrate, default to 115200"/>
   </doc>
   
@@ -14,14 +14,14 @@
   </dep>
 
   <header>
-    <file name = "dwm1001_dev.h" />
+    <file name="dwm1001_dev.h"/>
   </header>
 
-  <init fun = "dwm1001_dev_init()" />
-  <periodic fun = "dwm1001_dev_communication_periodic()" freq = "30" autorun = "TRUE" />
-  <event fun = "dwm1001_dev_communication_event()" />
+  <init fun="dwm1001_dev_init()"/>
+  <periodic fun="dwm1001_dev_periodic()" freq="5" autorun="TRUE"/>
+  <event fun="dwm1001_dev_event()"/>
 
-  <makefile target = "ap" >
+  <makefile>
     <configure name="DECAWAVE_UART" case="upper|lower"/>
     <configure name="DECAWAVE_BAUD" default="B115200"/>
     <file name="dwm1001_dev.c"/>

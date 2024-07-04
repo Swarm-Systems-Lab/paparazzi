@@ -24,16 +24,19 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
       <define name="NPS_BYPASS_AHRS"   value="TRUE"/>
       <define name="NPS_BYPASS_INS"    value="TRUE"/>
       <!-- Multiple agents simulation -->
-      <configure name="MODEM_PORT_OUT" value="4248"/>
-      <configure name="MODEM_PORT_IN"  value="4249"/>
+      <!--configure name="MODEM_PORT_OUT" value="4248"/>
+      <configure name="MODEM_PORT_IN"  value="4249"/-->
     </target>    
     
     <module name="actuators" type="pwm"/>
-    <module name="telemetry" type="xbee_api"/>
+    <module name="telemetry" type="transparent">
+    	<configure name="MODEM_PORT" value="UART1"/>
+    </module>
+    <!--module name="telemetry" type="xbee_api"/-->
 
     <module name="gps" type="ublox">
-    	<configure name="GPS_BAUD" value="B57600"/>
     	<configure name="GPS_PORT" value="UART4"/>
+      <configure name="GPS_BAUD" value="B57600"/>
     </module>
     <module name="gps_ubx_ucenter"/>
     <module name="imu" type="icm42688"/>
@@ -42,14 +45,19 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
       <define name="AHRS_FLOAT_MIN_SPEED_GPS_COURSE" value="0.1"/>
     </module>
 
-    <module name="nav"  type="rover_base">
+    <module name="nav" type="rover_base">
       <define name="ROVER_BASE_SEND_TRAJECTORY" value="FALSE"/>
     </module>
     
-    <module name="gvf"  type="module">
+    <module name="gvf" type="module">
       <define name="GVF_OCAML_GCS" value="FALSE"/>
     </module>
     
+    <module name="decawave" type="dwm1001_dev">
+      <configure name="DECAWAVE_UART" value="UART3"/>
+      <configure name="DECAWAVE_BAUD" value="B115200"/>
+    </module>
+
     <!-- Guidance modules -->
     <module name="gvf_module">
       <define name="OCAML_GCS" value="FALSE"/>

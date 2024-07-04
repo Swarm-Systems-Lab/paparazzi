@@ -1697,19 +1697,19 @@
       <description>
         CBF telemetry message.
       </description>
-      <field name="omega_safe" type="float"/>
+      <field name="omega_safe"    type="float"/>
       <field name="acs_id"        type="uint16[]"/>
       <field name="acs_available" type="uint8[]"/>
       <field name="acs_timeslost" type="uint16[]"/>
-      <field name="uref"       type="float[]"/>
-      <field name="prel_norm"  type="float[]"/>
-      <!--field name="px_rel"     type="float[]"/>
-      <field name="py_rel"     type="float[]"/>
-      <field name="vx_rel"     type="float[]"/>
-      <field name="vy_rel"     type="float[]"/-->
-      <field name="h_ref"      type="float[]"/>
-      <field name="h_dot_ref"  type="float[]"/>
-      <field name="psi_ref"    type="float[]"/>
+      <field name="uref"          type="float[]"/>
+      <field name="prel_norm"     type="float[]"/>
+      <!--field name="px_rel"        type="float[]"/>
+      <field name="py_rel"        type="float[]"/>
+      <field name="vx_rel"        type="float[]"/>
+      <field name="vy_rel"        type="float[]"/-->
+      <field name="h_ref"         type="float[]"/>
+      <field name="h_dot_ref"     type="float[]"/>
+      <field name="psi_ref"       type="float[]"/>
     </message>
 
     <message name="CBF_STATE" id="182">
@@ -1725,7 +1725,20 @@
       <field name="uref"   type="float"/>
     </message>
 
-    <!-- 183 is free -->
+    <message name="DWM1001_DEBUG" id="183">
+      <description>
+        dwm1001_dev debug message.
+      </description>
+      <field name="bytes_received" type="uint8[]"/>
+      <field name="msg_class"      type="uint8"/>
+      <field name="msg_len"        type="uint8"/>
+      <field name="msg_decoded"    type="float"/>
+      <field name="msg_count"      type="uint16"/>
+      <field name="status"         type="uint8"/>
+      <field name="error_last"     type="uint8"/>
+      <field name="error_count"    type="uint16"/>
+    </message>
+
     <!-- 184 is free -->
     <!-- 185 is free -->
     <!-- 186 is free -->

@@ -18,11 +18,14 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DWM1001_DEV_COMMUNICATION_H_
-#define DWM1001_DEV_COMMUNICATION_H_
+#ifndef DWM1001_DEV_H_
+#define DWM1001_DEV_H_
 
-extern void dwm1001_dev_communication_init(void);
-extern void dwm1001_dev_communication_periodic(void);
-extern void dwm1001_dev_communication_event(void);
+#define DWM1001_DEV_MAX_PAYLOAD 250
 
-#endif /* DWM1001_DEV_COMMUNICATION_H_ */
+/* External functions */
+extern void dwm1001_dev_init(void);
+extern void dwm1001_dev_periodic(void);
+extern void dwm1001_dev_event(void);
+
+#endif /* DWM1001_DEV_H_ */
