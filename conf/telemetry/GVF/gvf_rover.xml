@@ -28,6 +28,7 @@
       <!--message name="DCF"                    period="1.0"/-->
       <message name="CBF"                    period="1.0"/>
       <message name="DWM1001_DEBUG"          period="0.1"/>
+      <message name="DWM1001_DATA"           period="0.1"/>
     </mode>
     
     <mode name="rssi">

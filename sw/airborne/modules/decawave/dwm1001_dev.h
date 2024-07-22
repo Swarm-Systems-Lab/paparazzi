@@ -21,7 +21,20 @@
 #ifndef DWM1001_DEV_H_
 #define DWM1001_DEV_H_
 
-#define DWM1001_DEV_MAX_PAYLOAD 250
+#include <stdint.h>
+
+#ifndef DWM1001_NEI_ADDRESSES
+#define DWM1001_NEI_ADDRESSES {0}
+#endif // DWM1001_NEI_ADDRESSES
+
+struct dwm1001_data_t {
+  float sigma;
+  float centroid_xy[2];
+  float asc_dirc_xy[2];    
+  uint16_t debug;
+};
+
+extern struct dwm1001_data_t dwm1001_data;
 
 /* External functions */
 extern void dwm1001_dev_init(void);

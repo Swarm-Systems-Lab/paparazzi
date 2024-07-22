@@ -1725,20 +1725,31 @@
       <field name="uref"   type="float"/>
     </message>
 
+    <!-- DWM1001 -->
     <message name="DWM1001_DEBUG" id="183">
       <description>
         dwm1001_dev debug message.
       </description>
+      <field name="nei_addresses"  type="uint16[]"/>
+      <field name="acknowledge"    type="uint8" unit="bool"/>
       <field name="bytes_received" type="uint8[]"/>
       <field name="msg_class"      type="uint8"/>
-      <field name="msg_decoded"    type="float"/>
       <field name="msg_count"      type="uint16"/>
       <field name="status"         type="uint8"/>
       <field name="error_last"     type="uint8"/>
       <field name="error_count"    type="uint16"/>
     </message>
 
-    <!-- 184 is free -->
+    <message name="DWM1001_DATA" id="184">
+      <description>
+        dwm1001_dev data message.
+      </description>
+      <field name="sigma"    type="float"/>
+      <field name="centroid" type="float[]"/>
+      <field name="asc_dirc" type="float[]"/>
+      <field name="debug"    type="uint16"/>
+    </message>
+
     <!-- 185 is free -->
     <!-- 186 is free -->
     <!-- 187 is free -->
