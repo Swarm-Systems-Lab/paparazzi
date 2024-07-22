@@ -9,27 +9,10 @@
     <waypoint name="STDBY" lat="37.2976056" lon="-3.6831172"/>
     <waypoint name="P1" x="-10" y="0"/>
     <waypoint name="P2" x="10" y="0"/>
-    <waypoint name="S1" lat="37.2977109" lon="-3.6833980"/>
-    <waypoint name="S2" lat="37.2974235" lon="-3.6830931"/>
-    <waypoint name="S3" lat="37.2975209" lon="-3.6827830"/>
-    <waypoint name="S4" lat="37.2979303" lon="-3.6832822"/>
   </waypoints>
-
-  <sectors>
-    <sector color="orange" name="Survey">
-      <corner name="S1"/>
-      <corner name="S2"/>
-      <corner name="S3"/>
-      <corner name="S4"/>
-    </sector>
-  </sectors>
 
   <variables>
     <variable var="stb_rad" init="10" min="0" max="30" step="1"/>
-    <variable var="angle_ps" init="170" min="-180" max="179" step="1"/>
-    <variable var="sweep_dist_ps" init="1.5" min="0" max="10" step="0.5"/>
-    <variable var="shot_dist_ps" init="1.5" min="0" max="10" step="0.5"/>
-    <variable var="min_rad_ps" init="2" min="0" max="10" step="0.5"/>
   </variables>
 
 
@@ -59,14 +42,8 @@
       <call fun="gvf_ellipse_wp(WP_STDBY, gvf_ellipse_par.a, gvf_ellipse_par.b, 0)"/>
     </block>
     
-    <block name="Poly Survey">
-      <call_once fun="gvf_nav_survey_polygon_setup(WP_S1, 4, angle_ps, sweep_dist_ps, shot_dist_ps, min_rad_ps, 0)"/>
-      <call fun="gvf_nav_survey_polygon_run()"/>
-      <deroute block="Standby"/>
-    </block>
-    
-    <block name="line">
-      <call fun="gvf_line_wp1_wp2(WP_P1, WP_P2)"/>
+    <block name="CBF_Standby" strip_icon="oval.png" pre_call="cbf_on()" post_call="cbf_off()">
+      <call fun="gvf_ellipse_wp(WP_STDBY, gvf_ellipse_par.a, gvf_ellipse_par.b, 0)"/>
     </block>
     
   </blocks>
