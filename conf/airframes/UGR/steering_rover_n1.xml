@@ -49,7 +49,7 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
     <module name="decawave" type="dwm1001_dev">
       <configure name="DECAWAVE_UART" value="UART3"/>
       <configure name="DECAWAVE_BAUD" value="B115200"/>
-      <define name="DWM1001_NEI_ADDRESSES" value="{7090,5923}"/> <!-- {2177, 7090, 5923} -->
+      <define name="DWM1001_NEI_ADDRESSES" value="{2177,7090,5923}"/> <!-- {2177, 7090, 5923} -->
     </module>
 
     <!-- Guidance modules -->

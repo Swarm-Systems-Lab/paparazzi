@@ -69,8 +69,8 @@
 
 /* decode HighBytes */
 // #define DWM1001_MSG_TEST(_payload) (uint16_t)(*((uint8_t*)_payload+0)|(uint16_t)(*((uint8_t*)_payload+1+0))<<8)
-#define DWM1001_DECODE_UINT16(_payload, uint16, indx, jump) memcpy(uint16, _payload + 2*indx + jump, 2)
-#define DWM1001_DECODE_FLOAT(_payload, float, indx, jump) memcpy(float, _payload + 4*indx + jump, 4)
+#define DWM1001_DECODE_UINT16(_payload, uint16, indx, jump, len) memcpy(uint16, _payload + 2*indx + jump, 2*len)
+#define DWM1001_DECODE_FLOAT(_payload, float, indx, jump, len) memcpy(float, _payload + 4*indx + jump, 4*len)
 // #define DWM1001_DECODE_FLOAT(_payload , indx) ((float*)(_payload))[indx]
 
 /* dwm1001 structs */
@@ -104,7 +104,7 @@ float msg_decoded; //TODO: remove, just for debug
 static void send_dwm1001_debug(struct transport_tx *trans, struct link_device *dev)
 {
   uint8_t msg_len = dwm1001.msg_len;
-  if (msg_len == 0) msg_len = 1;
+  if (msg_len == 0) msg_len = 1; // len = 0 is not valid
   pprz_msg_send_DWM1001_DEBUG(trans, dev, AC_ID, dwm1001.nei_number, dwm1001.nei_addresses, (uint8_t*)&dwm1001.tables_ack, 
                               msg_len, dwm1001.msg_buff, &dwm1001.msg_class, &dwm1001.msg_cnt, 
                               &dwm1001.status, &dwm1001.error_last, &dwm1001.error_cnt);
@@ -112,8 +112,11 @@ static void send_dwm1001_debug(struct transport_tx *trans, struct link_device *d
 
 static void send_dwm1001_data(struct transport_tx *trans, struct link_device *dev)
 {
+  dwm1001_data.enu_xy[0] = stateGetPositionEnu_f()->x;
+  dwm1001_data.enu_xy[1] = stateGetPositionEnu_f()->y;
+
   pprz_msg_send_DWM1001_DATA(trans, dev, AC_ID, &dwm1001_data.sigma, 2, dwm1001_data.centroid_xy,
-                             2, dwm1001_data.asc_dirc_xy, &dwm1001_data.debug);
+                             2, dwm1001_data.asc_dirc_xy, 2, dwm1001_data.enu_xy);
 }
 #endif // PERIODIC_TELEMETRY
 
@@ -166,6 +169,7 @@ static void parse_byte(uint8_t var_byte)
       goto error;
   }
   return;
+
 error:
   dwm1001.error_cnt++;
   dwm1001.status = DWM1001_UNINIT;
@@ -174,14 +178,13 @@ error:
 
 static void decode_msg(void) 
 {
-  
+    uint8_t tmp_ack = true;
+    uint16_t tmp_address;
+
     switch (dwm1001.msg_class) {
       case DWM1001_MSG_CONFIRMATION :
-        bool tmp_ack = true;
-        uint16_t tmp_address;
-
         for (uint8_t i = 0; i < dwm1001.nei_number; i++) {
-          DWM1001_DECODE_UINT16(dwm1001.msg_buff, &tmp_address, i, 0);
+          DWM1001_DECODE_UINT16(dwm1001.msg_buff, &tmp_address, i, 0, 1);
           if (tmp_address != dwm1001.nei_addresses[i]) {
             tmp_ack = false;
             break;
@@ -191,15 +194,15 @@ static void decode_msg(void)
         break;
 
       case DWM1001_MSG_CENTROID :
-        DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.centroid_xy, 0, 0);
+        DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.centroid_xy, 0, 0, 2);
         break;
 
       case DWM1001_MSG_ASC_DIRC :
-        DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.asc_dirc_xy, 0, 0);
+        DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.asc_dirc_xy, 0, 0, 2);
         break;
 
       case DWM1001_MSG_SOURCE_DIST :
-        DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.sigma, 0, 0);
+        DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.sigma, 0, 0, 1);
         break;
 
       case DWM1001_MSG_DEBUG :

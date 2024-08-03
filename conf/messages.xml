@@ -1747,7 +1747,7 @@
       <field name="sigma"    type="float"/>
       <field name="centroid" type="float[]"/>
       <field name="asc_dirc" type="float[]"/>
-      <field name="debug"    type="uint16"/>
+      <field name="enu_pos"  type="float[]"/>
     </message>
 
     <!-- 185 is free -->

@@ -30,8 +30,8 @@
 struct dwm1001_data_t {
   float sigma;
   float centroid_xy[2];
-  float asc_dirc_xy[2];    
-  uint16_t debug;
+  float asc_dirc_xy[2];
+  float enu_xy[2];    
 };
 
 extern struct dwm1001_data_t dwm1001_data;
