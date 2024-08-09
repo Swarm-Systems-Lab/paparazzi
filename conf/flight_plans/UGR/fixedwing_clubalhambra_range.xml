@@ -1,0 +1,129 @@
+<!DOCTYPE flight_plan SYSTEM "../flight_plan.dtd">
+
+<flight_plan name="Range" lat0="37.2970936" lon0="-3.6831780" ground_alt="720" alt="750" max_dist_from_home="1000" qfu="90" security_height="50">
+
+  <header>  
+  </header>
+
+  <waypoints>
+    <waypoint name="HOME"  x="0.0" y="0.0"/>
+    <waypoint name="STDBY" lat="37.2979711" lon="-3.6837998"/>
+    <waypoint name="CLIMB" lat="37.2971575" lon="-3.6842103"/>
+    <waypoint name="SURV1" lat="37.2985587" lon="-3.6846697"/>
+    <waypoint name="SURV2" lat="37.2991396" lon="-3.6855311"/>
+    <waypoint name="SURV3" lat="37.2997430" lon="-3.6863969"/>
+    <waypoint name="SURV4" lat="37.3003716" lon="-3.6871981"/>
+    <waypoint name="SURV5" lat="37.3010568" lon="-3.6879480"/>
+    <waypoint name="SURV6" lat="37.3017239" lon="-3.6887150"/>
+    <waypoint name="SURV7" lat="37.3023523" lon="-3.6895296"/>
+  </waypoints>
+  
+  <variables>
+    <variable var="a_stb"      init="100.0" min="1.0" max="150.0" step="1.0"/>
+    <variable var="b_stb"      init="100.0" min="1.0" max="150.0" step="1.0"/>
+    <variable var="alpha_stb"  init="0.0"   min="0.0" max="180.0" step="1.0"/>
+    
+    <variable var="a_surv"     init="100.0" min="1.0" max="150.0" step="1.0"/>
+    <variable var="b_surv"     init="100.0" min="1.0" max="150.0" step="1.0"/>
+    <variable var="alpha_surv" init="0.0"   min="0.0" max="180.0" step="1.0"/>
+  </variables>
+  
+  <modules>
+    <module name="gvf_module">
+      <define name="GVF_OCAML_GCS" value="FALSE"/>
+    </module>
+  </modules>
+
+  <exceptions>
+      <!-- Takeoff - Standby -->
+    <exception cond="(IndexOfBlock('Takeoff') == nav_block) @AND
+      (GetPosAlt() @GT (GetAltRef() + 50))" deroute="Standby"/>
+      <!-- Block Time GT 300 -->
+    <exception cond="!(IndexOfBlock('Standby') @GEQ nav_block) @AND
+      (NavBlockTime() @GT 180)" deroute="Standby"/>
+      <!-- Bat Low  -->
+    <exception cond="!(IndexOfBlock('Standby') @GEQ nav_block) @AND
+      electrical.bat_critical" deroute="Standby"/>
+
+    <!-- RC lost && Block Time GT 300 -->
+    <!--exception cond="!(IndexOfBlock('Standby') @GEQ nav_block) @AND
+      (radio_control.status == RC_REALLY_LOST) @AND 
+      (NavBlockTime() @GT 300)" deroute="Standby"/-->
+  </exceptions>
+  
+  <blocks>
+    <block name="Wait GPS" strip_icon="gps.png">
+      <set value="1" var="autopilot.kill_throttle"/>
+      <while cond="!GpsFixValid()"/>
+    </block>
+    
+    <block name="Geo init" strip_icon="googleearth.png">
+      <while cond="LessThan(NavBlockTime(), 10)"/>
+    </block>
+    
+    <block name="Holding point">
+      <set value="1" var="autopilot.kill_throttle"/>
+      <attitude roll="0" throttle="0" vmode="throttle"/>
+    </block>
+    
+    <block key="t" name="Takeoff" strip_button="Takeoff (wp CLIMB)" strip_icon="takeoff.png">
+      <set value="0" var="autopilot.kill_throttle"/>
+      <set value="0" var="autopilot.flight_time"/>
+      <set value="1" var="autopilot.launch"/>
+      <go from="HOME" pitch="15" throttle="1.0" vmode="throttle" wp="CLIMB"/>
+    </block>
+    
+    <block key="s" name="Standby" strip_button="Standby" strip_icon="home.png">
+      <call_once fun="NavVerticalAutoThrottleMode(0.0)"/>
+      <call_once fun="NavVerticalAltitudeMode(flight_altitude, 0.0)"/>
+      <call fun="gvf_ellipse_wp(WP_STDBY, a_stb, b_stb, alpha_stb)"/>
+    </block>
+    
+    <!-- ## RANGE TEST EXPERIMENT ## -->
+
+    <block name="ellipse_survey_1" strip_icon="oval.png">
+      <call_once fun="NavVerticalAutoThrottleMode(0.0)"/>
+      <call_once fun="NavVerticalAltitudeMode(flight_altitude, 0.0)"/>
+      <call fun="gvf_ellipse_wp(WP_SURV1, a_surv, b_surv, alpha_surv)"/>
+    </block>
+
+    <block name="ellipse_survey_2" strip_icon="oval.png">
+      <call_once fun="NavVerticalAutoThrottleMode(0.0)"/>
+      <call_once fun="NavVerticalAltitudeMode(flight_altitude, 0.0)"/>
+      <call fun="gvf_ellipse_wp(WP_SURV2, a_surv, b_surv, alpha_surv)"/>
+    </block>
+
+    <block name="ellipse_survey_3" strip_icon="oval.png">
+      <call_once fun="NavVerticalAutoThrottleMode(0.0)"/>
+      <call_once fun="NavVerticalAltitudeMode(flight_altitude, 0.0)"/>
+      <call fun="gvf_ellipse_wp(WP_SURV3, a_surv, b_surv, alpha_surv)"/>
+    </block>
+
+    <block name="ellipse_survey_4" strip_icon="oval.png">
+      <call_once fun="NavVerticalAutoThrottleMode(0.0)"/>
+      <call_once fun="NavVerticalAltitudeMode(flight_altitude, 0.0)"/>
+      <call fun="gvf_ellipse_wp(WP_SURV4, a_surv, b_surv, alpha_surv)"/>
+    </block>
+
+    <block name="ellipse_survey_5" strip_icon="oval.png">
+      <call_once fun="NavVerticalAutoThrottleMode(0.0)"/>
+      <call_once fun="NavVerticalAltitudeMode(flight_altitude, 0.0)"/>
+      <call fun="gvf_ellipse_wp(WP_SURV5, a_surv, b_surv, alpha_surv)"/>
+    </block>
+
+    <block name="ellipse_survey_6" strip_icon="oval.png">
+      <call_once fun="NavVerticalAutoThrottleMode(0.0)"/>
+      <call_once fun="NavVerticalAltitudeMode(flight_altitude, 0.0)"/>
+      <call fun="gvf_ellipse_wp(WP_SURV6, a_surv, b_surv, alpha_surv)"/>
+    </block>
+
+    <block name="ellipse_survey_7" strip_icon="oval.png">
+      <call_once fun="NavVerticalAutoThrottleMode(0.0)"/>
+      <call_once fun="NavVerticalAltitudeMode(flight_altitude, 0.0)"/>
+      <call fun="gvf_ellipse_wp(WP_SURV7, a_surv, b_surv, alpha_surv)"/>
+    </block>
+
+    <!-- ########################### -->
+
+  </blocks>
+</flight_plan>

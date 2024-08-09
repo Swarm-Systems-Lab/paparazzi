@@ -1,9 +1,9 @@
 <!DOCTYPE flight_plan SYSTEM "../flight_plan.dtd">
 
 <flight_plan alt="750" geofence_max_alt="3000" geofence_max_height="1000" ground_alt="720" home_mode_height="200" lat0="37.29745306" lon0="-3.68272961" max_dist_from_home="1500" name="Sonic2" qfu="90" security_height="25">
+ 
   <header>
-
-</header>
+  </header>
 
   <waypoints>
     <waypoint name="HOME" alt="713" x="-0.648" y="-0.647"/>

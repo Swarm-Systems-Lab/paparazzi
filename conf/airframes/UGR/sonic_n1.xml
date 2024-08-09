@@ -1,14 +1,14 @@
 <!DOCTYPE airframe SYSTEM "../airframe.dtd">
 
 <!--
-  Sonicmodell 1
+  Sonic model
 
     - Propeller:        5x5 3 blades
     - Motor:            2206 2300KV
     - Motor controller: Flycolor 30A LV
     - Radio modem:      Xbee Pro S1 2.4 Ghz
     - Radio control:    Futaba T16SZ
-    - GPS:              Ublox M8N
+    - GPS:              Ublox M8N (5-10Hz max)
     - Autopilot;        Apogee V1.0
 
 -->
@@ -18,17 +18,14 @@
   <firmware name="fixedwing">
 
     <define name="NAVIGATION_FREQUENCY" value="50"/> <!--  unit="Hz" -->
-    <!--configure name="CONTROL_FREQUENCY" value="120"/--> <!--  unit="Hz" -->
-    <!--configure name="TELEMETRY_FREQUENCY" value="60"/--> <!--  unit="Hz" -->
-    <!--configure name="MODULES_FREQUENCY" value="512"/--> <!--  unit="Hz" -->
 
     <!--define name="USE_I2C1"/-->
     <define name="USE_GYRO_PITCH_RATE"/>
-    <!--configure name="PERIODIC_FREQUENCY" value="100"/-->
 
     <target name="ap" board="apogee_1.0_chibios">
       <module name="radio_control" type="sbus"/>
     </target>
+
     <target name="nps" board="pc">
       <module name="radio_control" type="ppm"/>
       <module name="fdm" type="jsbsim"/>
@@ -36,8 +33,16 @@
       <configure name="MODEM_PORT_OUT" value="4249"/-->
     </target>
 
+    <!-- Communication -->
     <module name="telemetry" type="xbee_api"/>
 
+    <!-- SD logging -->
+    <module name="tlsf"/>
+    <module name="logger" type="sd_chibios"/>
+    <module name="pprzlog"/>
+    <module name="flight_recorder"/>
+
+    <!-- IMU, AHRS, INS -->
     <module name="imu" type="apogee">
       <define name="IMU_APOGEE_CHAN_X" value="1"/>
       <define name="IMU_APOGEE_CHAN_Y" value="0"/>
@@ -46,32 +51,29 @@
     <module name="ahrs" type="float_dcm"/>
     <configure name="USE_MAGNETOMETER" value="FALSE"/>
     <define name="USE_GPS_HEADING" value="TRUE"/>
-    
+
     <module name="ins" type="alt_float"/>
 
-    <module name="control" type="new"/>
-    <module name="navigation"/>
-    <!--module name="takeoff_detect"/-->
-
-    <module name="tlsf"/>
-    <!--module name="sdlog"/>
-    <module name="logger" type="sd_chibios"/>
-    <module name="flight_recorder"/ -->
-    
+    <!-- Sensors -->
     <module name="gps_ubx_ucenter"/>
     <module name="gps" type="ublox">
       <configure name="GPS_BAUD" value="B38400"/>
     </module>
 
-    <module name="cbf">
+    <!-- GNC -->
+    <!--module name="takeoff_detect"/-->
+    <module name="control" type="new"/>
+    <module name="navigation"/>
+    <!--module name="cbf">
       <define name="CBF_NEI_AC_IDS" value="{6,200}"/>
-    </module>
+    </module-->
+
   </firmware>
 
   <servos>
-    <servo name="MOTOR" no="0" min="1000" neutral="1000" max="2000"/>
+    <servo name="MOTOR"         no="0" max="2000" neutral="1000" min="1000"/>
     <servo name="AILEVON_RIGHT" no="1" max="1000" neutral="1430" min="2000"/>
-    <servo name="AILEVON_LEFT" no="2" max="2000" neutral="1693" min="1000"/>
+    <servo name="AILEVON_LEFT"  no="2" max="2000" neutral="1693" min="1000"/>
   </servos>
 
   <commands>
@@ -92,10 +94,10 @@
   </section>
 
   <command_laws>
-    <let var="aileron" value="@ROLL  * AILEVON_AILERON_RATE"/>
+    <let var="aileron"  value="@ROLL  * AILEVON_AILERON_RATE"/>
     <let var="elevator" value="@PITCH * AILEVON_ELEVATOR_RATE"/>
-    <set servo="MOTOR" value="@THROTTLE"/>
-    <set servo="AILEVON_LEFT" value="$elevator - $aileron"/>
+    <set servo="MOTOR"  value="@THROTTLE"/>
+    <set servo="AILEVON_LEFT"  value="$elevator - $aileron"/>
     <set servo="AILEVON_RIGHT" value="$elevator + $aileron"/>
   </command_laws>
 
@@ -141,7 +143,12 @@
   </section>
 
   <section name="BAT">
-    <define name="CATASTROPHIC_BAT_LEVEL" value="8.6" unit="V"/>
+    <!-- LiPo 3S -->
+    <define name="MAX_BAT_LEVEL"          value="12.60" unit="V"/>
+    <define name="LOW_BAT_LEVEL"          value="11.20" unit="V"/>
+    <define name="CRITIC_BAT_LEVEL"       value="10.80" unit="V"/>
+    <define name="CATASTROPHIC_BAT_LEVEL" value="9.00"  unit="V"/>
+ 
     <define name="MilliAmpereOfAdc(_adc)" value="(_adc-632)*4.14"/>
   </section>
 
