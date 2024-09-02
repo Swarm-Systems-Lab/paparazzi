@@ -94,26 +94,44 @@
 #warning "Construction constant SR_MEASURED_KF for steering wheel rover not defined"
 #endif
 
+// MOV_AVG_M: Moving Average filter. Number of samples
+#ifndef MOV_AVG_M
+#define MOV_AVG_M 10
+#endif
 
 /** Steering rover guidance STRUCTURES **/
 // High level commands
 typedef struct {
+  float max_speed;
+  float min_speed;
   float speed;
   float delta;
+  float z_kappa;
+  float z_ori;
 } sr_cmd_t;
 
 // Main structure
 typedef struct {
   sr_cmd_t cmd;
-  float throttle;
 
+  float throttle;
   float speed_error;
   float kf;
   float kp;
   float ki;
+  float kd;
 } rover_ctrl;
 
+// Rollover protection structure
+typedef struct {
+  bool protect_curvature;
+  float max_lateral_accel;
+  float beta;
+  float h_cbf;
+} rover_rollover_protection;
+
 extern rover_ctrl guidance_control;
+extern rover_rollover_protection rollover_protection;
 
 /** Steering rover guidance EXT FUNCTIONS **/
 extern void rover_guidance_steering_init(void);

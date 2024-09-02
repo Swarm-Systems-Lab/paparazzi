@@ -27,6 +27,8 @@
 #ifndef GVF_LOW_LEVEL_CONTROL_H
 #define GVF_LOW_LEVEL_CONTROL_H
 
+#include "gvf_common.h"
+
 #ifdef FIXEDWING_FIRMWARE
 #include "firmwares/fixedwing/nav.h"
 #include "modules/nav/common_nav.h"

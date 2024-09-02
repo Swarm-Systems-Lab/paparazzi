@@ -29,10 +29,12 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
     </target>    
     
     <module name="actuators" type="pwm"/>
-    <!--module name="telemetry" type="transparent">
-    	<configure name="MODEM_PORT" value="UART1"/>
-    </module-->
     <module name="telemetry" type="xbee_api"/>
+    <!--
+    <module name="telemetry" type="transparent">
+    	<configure name="MODEM_PORT" value="UART1"/>
+    </module>
+    -->
 
     <module name="gps" type="ublox">
     	<configure name="GPS_PORT" value="UART4"/>
@@ -52,7 +54,7 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
     <module name="decawave" type="dwm1001_dev">
       <configure name="DECAWAVE_UART" value="UART3"/>
       <configure name="DECAWAVE_BAUD" value="B115200"/>
-      <define name="DWM1001_NEI_ADDRESSES" value="{2177,7090,5923}"/> <!-- {2177, 7090, 5923} -->
+      <define name="DWM1001_NEI_ADDRESSES" value="{2177,7090,5923}"/>
     </module>
 
     <!-- Guidance modules -->

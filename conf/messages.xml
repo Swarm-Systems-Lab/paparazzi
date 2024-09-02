@@ -1750,7 +1750,25 @@
       <field name="enu_pos"  type="float[]"/>
     </message>
 
-    <!-- 185 is free -->
+    <!-- ROVER_CTRL -->
+    <message name="ROVER_CTRL" id="185">
+      <description>
+        dwm1001_dev data message.
+      </description>
+      <field name="cmd_delta"   type="float"/>
+      <field name="cmd_speed"   type="float"/>
+      <field name="speed_error" type="float"/>
+      <field name="throttle"    type="float"/>
+      <field name="kp"          type="float"/>
+      <field name="ki"          type="float"/>
+      <field name="kd"          type="float"/>
+      <field name="kp_speed"    type="float"/>
+      <field name="ki_speed"    type="float"/>
+      <field name="kd_speed"    type="float"/>
+      <field name="speed_avg"   type="float"/>
+      <field name="kappa"       type="float"/>
+    </message>
+
     <!-- 186 is free -->
     <!-- 187 is free -->
     <!-- 188 is free -->

@@ -44,6 +44,7 @@ struct PID_f {
   float e[2];     ///< input
   float sum;      ///< integral of input
   float g[3];     ///< controller gains (Kp, Kd, Ki)
+  float a[3];     ///< output splited in PID actions (ap, ad, ai)
   float max_sum;  ///< windup protection, max of Ki * sum(e_k * dt)
 };
 
@@ -54,6 +55,7 @@ static inline void init_pid_f(struct PID_f *pid, float Kp, float Kd, float Ki, f
     { 0.f , 0.f },
     0.f,
     { Kp, Kd, Ki },
+    { 0.f, 0.f, 0.f },
     max_sum
   };
 }
@@ -69,7 +71,7 @@ static inline float update_pid_f(struct PID_f *pid, float value, float dt)
 {
   pid->e[1] = pid->e[0];
   pid->e[0] = value;
-  float integral = pid->g[2] * (pid->sum + value);
+  float integral = pid->g[2] * (pid->sum + value) * dt ; // dt added;
   if (integral > pid->max_sum) {
     integral = pid->max_sum;
   } else if (integral < -pid->max_sum) {
@@ -78,6 +80,12 @@ static inline float update_pid_f(struct PID_f *pid, float value, float dt)
     pid->sum += value;
   }
   pid->u = pid->g[0] * pid->e[0] + pid->g[1] * (pid->e[0] - pid->e[1]) / dt + integral;
+
+  // Split the three PID actions for telemetry
+  pid->a[0] = pid->g[0] * pid->e[0];
+  pid->a[1] = pid->g[1] * (pid->e[0] - pid->e[1]) / dt;
+  pid->a[2] = integral;
+
   return pid->u;
 }
 
@@ -334,5 +342,5 @@ static inline void set_gains_pi_d_df(struct PI_D_df *pid, float Kp, float Kd, fl
   pid->g[2] = Kd;
 }
 
-#endif
+#endif // PID_H
 

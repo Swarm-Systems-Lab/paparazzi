@@ -182,6 +182,10 @@ void gvf_control_2D(float ke, float kn, float e,
 
   float omega = omega_d + kn * (mr_x * md_y - mr_y * md_x);
   
+  // Set GVF common info
+  gvf_c_info.kappa   = (nx*(H12*ny - nx*H22) + ny*(H21*nx - H11*ny))/powf(nx*nx + ny*ny,1.5);
+  gvf_c_info.ori_err = 1 - (md_x*cosf(course) + md_y*sinf(course));
+
   gvf_low_level_control_2D(omega);
 }
 

@@ -36,6 +36,7 @@
 #endif
 
 #include "std.h"
+#include "gvf_common.h"
 
 /** @typedef gvf_con
 * @brief Control parameters for the GVF

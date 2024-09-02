@@ -178,42 +178,42 @@ error:
 
 static void decode_msg(void) 
 {
-    uint8_t tmp_ack = true;
-    uint16_t tmp_address;
+  uint8_t tmp_ack = true;
+  uint16_t tmp_address;
 
-    switch (dwm1001.msg_class) {
-      case DWM1001_MSG_CONFIRMATION :
-        for (uint8_t i = 0; i < dwm1001.nei_number; i++) {
-          DWM1001_DECODE_UINT16(dwm1001.msg_buff, &tmp_address, i, 0, 1);
-          if (tmp_address != dwm1001.nei_addresses[i]) {
-            tmp_ack = false;
-            break;
-          }
+  switch (dwm1001.msg_class) {
+    case DWM1001_MSG_CONFIRMATION :
+      for (uint8_t i = 0; i < dwm1001.nei_number; i++) {
+        DWM1001_DECODE_UINT16(dwm1001.msg_buff, &tmp_address, i, 0, 1);
+        if (tmp_address != dwm1001.nei_addresses[i]) {
+          tmp_ack = false;
+          break;
         }
-        dwm1001.tables_ack = tmp_ack;
-        break;
+      }
+      dwm1001.tables_ack = tmp_ack;
+      break;
 
-      case DWM1001_MSG_CENTROID :
-        DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.centroid_xy, 0, 0, 2);
-        break;
+    case DWM1001_MSG_CENTROID :
+      DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.centroid_xy, 0, 0, 2);
+      break;
 
-      case DWM1001_MSG_ASC_DIRC :
-        DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.asc_dirc_xy, 0, 0, 2);
-        break;
+    case DWM1001_MSG_ASC_DIRC :
+      DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.asc_dirc_xy, 0, 0, 2);
+      break;
 
-      case DWM1001_MSG_SOURCE_DIST :
-        DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.sigma, 0, 0, 1);
-        break;
+    case DWM1001_MSG_SOURCE_DIST :
+      DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.sigma, 0, 0, 1);
+      break;
 
-      case DWM1001_MSG_DEBUG :
-        // DWM1001_DECODE_UINT16(dwm1001.msg_buff, &dwm1001_data.debug, 0, 0);
-        // DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.sigma, 0, 2);
-        break;
+    case DWM1001_MSG_DEBUG :
+      // DWM1001_DECODE_UINT16(dwm1001.msg_buff, &dwm1001_data.debug, 0, 0);
+      // DWM1001_DECODE_FLOAT(dwm1001.msg_buff, &dwm1001_data.sigma, 0, 2);
+      break;
 
-      default:
-        dwm1001.error_last = DWM1001_ERR_UNK_CLASS;
-        dwm1001.error_cnt++;
-    }
+    default:
+      dwm1001.error_last = DWM1001_ERR_UNK_CLASS;
+      dwm1001.error_cnt++;
+  }
 
   dwm1001.msg_available = false;
   return;

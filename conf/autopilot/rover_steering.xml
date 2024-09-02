@@ -14,7 +14,7 @@
       <include name="navigation.h"/>
       <include name="state.h"/>
 
-      <define  name="RCLost()" value="(radio_control.status == RC_REALLY_LOST)"/>
+      <define  name="RCLost()" value="(radio_control.status == RC_REALLY_LOST)"/> <!-- TODO: define it in nav.h?? -->
       <define  name="RCCruiseMode0()" value="rc_mode_switch(RADIO_CRUISE_MODE, 0, 2)" cond="ifdef RADIO_CRUISE_MODE"/>
       <define  name="RCCruiseMode1()" value="rc_mode_switch(RADIO_CRUISE_MODE, 1, 2)" cond="ifdef RADIO_CRUISE_MODE"/>
       <define  name="RCCruiseMode0()" value="TRUE" cond="ifndef RADIO_CRUISE_MODE"/>
@@ -27,10 +27,11 @@
 
     <exceptions>
       <exception cond="nav.too_far_from_home" deroute="HOME"/>
-      <exception cond="kill_switch_is_on()"   deroute="KILL"/>
+      <exception cond="kill_switch_is_on()"   deroute="KILL"/> <!-- Radio KILL_SWITCH -->
+      <exception cond="RCLost() || (GpsIsLost() && autopilot_in_flight())" deroute="KILL"/>
     </exceptions>
 
-    <!-- * AP MODES * ......................................................................... -->
+    <!-- * AP MODES * ...................................................... -->
     <!-- RC Manual -->
     <mode name="DIRECT" shortname="MANUAL">
       <select cond="RCMode0() && RCCruiseMode0()"/>
@@ -46,10 +47,10 @@
 
         <call fun="SetAPThrottleFromCommands(commands[COMMAND_THROTTLE])"/>
       </control>
-      <exception cond="RCLost()" deroute="KILL"/>
     </mode>
 
-    <!-- Cruiser: Speed ctrl (from state speed on enter) + Heading from RC -->
+    <!-- Cruiser: Speed ctrl (from state speed on enter)
+                + heading from RC --> <!-- TODO: delete this mode?? -->
     <mode name="CRUISER">
       <select cond="(RCMode1() || RCMode0()) && RCCruiseMode1()"/>
       <on_enter>
@@ -67,12 +68,12 @@
 
         <call fun="SetAPThrottleFromCommands()"/>
       </control>
-      <exception cond="RCLost() || (GpsIsLost() && autopilot_in_flight())" deroute="KILL"/>
     </mode>
     
-    <!-- Assisted: RC manul throttle + Heading ctrl (from GCS & flight plans) -->
+    <!-- Assisted: RC manul throttle
+                 + heading ctrl (from GCS & flight plans) -->
     <mode name="ASSISTED">
-      <select cond="(RCMode1() || RCMode2()) && RCCruiseMode0()" exception="HOME"/>
+      <select cond="(RCMode1() || RCMode2()) && RCCruiseMode0()"/>
       <on_enter>
         <call fun="rover_guidance_steering_pid_reset()"/>
       </on_enter>
@@ -88,13 +89,13 @@
 
         <call fun="SetAPThrottleFromCommands(commands[COMMAND_THROTTLE])"/>
       </control>
-      <exception cond="RCLost() || (GpsIsLost() && autopilot_in_flight())" deroute="KILL"/>
     </mode>
 
-    <!-- Navigation: Speed crtl (from state speed on enter) + heading ctrl (from GCS & flight plans) -->
+    <!-- Navigation: Speed crtl (from state speed on enter) 
+                   + heading ctrl (from GCS & flight plans) -->
     <mode name="NAV">
       <select cond="$DEFAULT_MODE"/>
-      <select cond="RCMode2() && RCCruiseMode1()" exception="HOME"/>
+      <select cond="RCMode2() && RCCruiseMode1()"/>
       <on_enter>
         <call fun="guidance_control.cmd.speed = stateGetHorizontalSpeedNorm_f()"/>
       </on_enter>
@@ -111,7 +112,6 @@
 
         <call fun="SetAPThrottleFromCommands()"/>
       </control>
-      <exception cond="GpsIsLost() && autopilot_in_flight()" deroute="KILL"/>
     </mode>
     
     <!-- HOME (not yet implemented) -->
@@ -124,12 +124,10 @@
         
         <call fun="SetAPThrottleFromCommands()"/>
       </control>
-      <exception cond="GpsIsLost()" deroute="KILL"/>
     </mode>
 
     <!-- Kill throttle -->
     <mode name="KILL">
-      <select cond="kill_switch_is_on()"/>
       <on_enter>
         <call fun="autopilot_set_in_flight(false)"/>
         <call fun="autopilot_set_motors_on(false)"/>
@@ -141,6 +139,7 @@
         <call fun="SetAPThrottleFromCommands()"/>
       </control>
     </mode>
+  <!-- ..................................................................... -->
 
   </state_machine>
 

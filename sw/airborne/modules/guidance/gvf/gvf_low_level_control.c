@@ -62,7 +62,7 @@ void gvf_low_level_getState(void)
   #endif
 }
 
-void gvf_low_level_control_2D(float omega __attribute__((unused)))
+void gvf_low_level_control_2D(float omega)
 { 
   #ifdef CBF_H
   // Run CBF
@@ -89,7 +89,7 @@ void gvf_low_level_control_2D(float omega __attribute__((unused)))
   }
   #endif
 
-  gvf_control.omega = omega;
+  gvf_c_omega.omega  = omega;
 }
 
 bool gvf_nav_approaching(float wp_x, float wp_y, float from_x, float from_y, float t) 

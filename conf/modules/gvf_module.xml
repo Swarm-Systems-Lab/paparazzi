@@ -61,6 +61,7 @@ For more details we refer to https://wiki.paparazziuav.org/wiki/Module/guidance_
   </settings>
 
    <header>
+     <file name="gvf_common.h"/>
      <file name="gvf.h"/>
      <file name="gvf_low_level_control.h"/>
      <file name="trajectories/gvf_line.h"/>
@@ -72,6 +73,7 @@ For more details we refer to https://wiki.paparazziuav.org/wiki/Module/guidance_
    <init fun = "gvf_init()"/>
 
    <makefile firmware="fixedwing">
+     <file name="gvf_common.c"/>
      <file name="gvf.c"/>
      <file name="gvf_low_level_control.c"/>
      <file name="trajectories/gvf_line.c"/>
@@ -81,6 +83,7 @@ For more details we refer to https://wiki.paparazziuav.org/wiki/Module/guidance_
    </makefile>
 
    <makefile firmware="rover">
+     <file name="gvf_common.c"/>
      <file name="gvf.c"/>
      <file name="gvf_low_level_control.c"/>
      <file name="trajectories/gvf_line.c"/>
@@ -90,4 +93,3 @@ For more details we refer to https://wiki.paparazziuav.org/wiki/Module/guidance_
    </makefile>
 
 </module>
-
