@@ -1,10 +1,14 @@
 <!DOCTYPE module SYSTEM "module.dtd">
 
-<module name="gvf_module" dir="guidance/gvf">
+<module name="gvf_classic_ik" dir="guidance/gvf">
   <doc>
     <description>Guidance algorithm for tracking smooth trajectories. The algorithm is based on the idea of stearing the vehicle to a vector field that smoothly converges to the desired trajectory.
 For more details we refer to https://wiki.paparazziuav.org/wiki/Module/guidance_vector_field .
     </description>
+    <section name="IK" prefix="GVF_IK_">
+      <define name="FD_AMPLITUDE" value="0" description="Error feedforward amplitude"/>
+      <define name="FD_OMEGA" value="0" description="Error feedforward angular velocity" unit="rad/s"/>
+    </section>
     <section name="Ellipse" prefix="GVF_ELLIPSE_">
       <define name="KE" value="1" description="Gain for the aggresivity of the gvf"/>
       <define name="KN" value="1" description="Gain for the alignment of the vehicle with the gvf"/>
@@ -28,11 +32,13 @@ For more details we refer to https://wiki.paparazziuav.org/wiki/Module/guidance_
       <define name="A" value="0" description="Amplitude for the sinusoidal y=Asin(Wx + OFF)" unit="m"/>
     </section>
   </doc>
-  <settings name="GVF">
+  <settings name="GVF_IK">
     <dl_settings>
-      <dl_settings NAME="GVF">
+      <dl_settings NAME="GVF_IK">
         <dl_settings NAME="Control">
-          <dl_setting MAX="1" MIN="-1" STEP="2" VAR="gvf_control.s" shortname = "direction"/>
+          <dl_setting MAX="1" MIN="-1" STEP="2" VAR="gvf_ik_control.s" shortname = "direction"/>
+          <dl_setting MAX="1" MIN="0" STEP="0.001" VAR="gvf_ik_control.fd_amplitude" shortname = "fd_amplitude (phi)" param="GVF_IK_FD_AMPLITUDE"/>
+          <dl_setting MAX="10" MIN="0" STEP="0.01" VAR="gvf_ik_control.fd_omega" shortname = "fd_omega (rad/s)" param="GVF_IK_FD_OMEGA"/>
         </dl_settings>
         <dl_settings NAME="Ellipse">
           <dl_setting MAX="5" MIN="0.0" STEP="0.01" VAR="gvf_ellipse_par.ke" shortname="ell_ke" param="GVF_ELLIPSE_KE"/>
@@ -62,20 +68,18 @@ For more details we refer to https://wiki.paparazziuav.org/wiki/Module/guidance_
 
    <header>
      <file name="gvf_common.h"/>
-     <file name="gvf.h"/>
-     <file name="gvf_low_level_control.h"/>
+     <file name="gvf_ik.h"/>
      <file name="trajectories/gvf_line.h"/>
      <file name="trajectories/gvf_sin.h"/>
      <file name="trajectories/gvf_ellipse.h"/>
      <file name="nav/nav_survey_polygon_gvf.h"/>
    </header>
 
-   <init fun = "gvf_init()"/>
+   <init fun = "gvf_ik_init()"/>
 
    <makefile firmware="fixedwing">
      <file name="gvf_common.c"/>
-     <file name="gvf.c"/>
-     <file name="gvf_low_level_control.c"/>
+     <file name="gvf_ik.c"/>
      <file name="trajectories/gvf_line.c"/>
      <file name="trajectories/gvf_sin.c"/>
      <file name="trajectories/gvf_ellipse.c"/>
@@ -84,8 +88,7 @@ For more details we refer to https://wiki.paparazziuav.org/wiki/Module/guidance_
 
    <makefile firmware="rover">
      <file name="gvf_common.c"/>
-     <file name="gvf.c"/>
-     <file name="gvf_low_level_control.c"/>
+     <file name="gvf_ik.c"/>
      <file name="trajectories/gvf_line.c"/>
      <file name="trajectories/gvf_sin.c"/>
      <file name="trajectories/gvf_ellipse.c"/>

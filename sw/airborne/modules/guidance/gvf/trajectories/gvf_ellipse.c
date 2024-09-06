@@ -26,8 +26,6 @@
  *  2D Ellipse trajectory
  */
 
-
-#include "modules/nav/common_nav.h"
 #include "gvf_ellipse.h"
 #include "generated/airframe.h"
 

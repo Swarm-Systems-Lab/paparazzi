@@ -25,8 +25,10 @@
  *  Guidance algorithm based on vector fields
  */
 
-#ifndef GVF_H
-#define GVF_H
+#ifndef GVF_IK_H
+#define GVF_IK_H
+
+#define GVF_GRAVITY 9.806
 
 /*! Default GCS trajectory painter */
 #ifndef GVF_OCAML_GCS
@@ -46,39 +48,43 @@
 typedef struct {
   float ke;
   float kn;
+  float phi;
   float error;
   float omega;
   int8_t s;
-} gvf_con;
 
-extern gvf_con gvf_control;
+  float fd_amplitude;
+  float fd_omega;
+} gvf_ik_con;
 
-extern void gvf_init(void);
-void gvf_control_2D(float ke, float kn, float e,
+extern gvf_ik_con gvf_ik_control;
+
+extern void gvf_ik_init(void);
+void gvf_ik_control_2D(float ke, float kn, float e,
                     struct gvf_grad *, struct gvf_Hess *);
-extern void gvf_set_direction(int8_t s);
+extern void gvf_ik_set_direction(int8_t s);
 
 // Straigh line
-extern bool gvf_line_XY_heading(float x, float y, float heading);
-extern bool gvf_line_XY1_XY2(float x1, float y1, float x2, float y2);
-extern bool gvf_line_wp1_wp2(uint8_t wp1, uint8_t wp2);
-extern bool gvf_segment_loop_XY1_XY2(float x1, float y1, float x2, float y2, float d1, float d2);
-extern bool gvf_segment_loop_wp1_wp2(uint8_t wp1, uint8_t wp2, float d1, float d2);
-extern bool gvf_segment_XY1_XY2(float x1, float y1, float x2, float y2);
-extern bool gvf_segment_wp1_wp2(uint8_t wp1, uint8_t wp2);
-extern bool gvf_line_wp_heading(uint8_t wp, float heading);
+extern bool gvf_ik_line_XY_heading(float x, float y, float heading);
+extern bool gvf_ik_line_XY1_XY2(float x1, float y1, float x2, float y2);
+extern bool gvf_ik_line_wp1_wp2(uint8_t wp1, uint8_t wp2);
+extern bool gvf_ik_segment_loop_XY1_XY2(float x1, float y1, float x2, float y2, float d1, float d2);
+extern bool gvf_ik_segment_loop_wp1_wp2(uint8_t wp1, uint8_t wp2, float d1, float d2);
+extern bool gvf_ik_segment_XY1_XY2(float x1, float y1, float x2, float y2);
+extern bool gvf_ik_segment_wp1_wp2(uint8_t wp1, uint8_t wp2);
+extern bool gvf_ik_line_wp_heading(uint8_t wp, float heading);
 
 
 // Ellipse
-extern bool gvf_ellipse_wp(uint8_t wp, float a, float b, float alpha);
-extern bool gvf_ellipse_XY(float x, float y, float a, float b, float alpha);
+extern bool gvf_ik_ellipse_wp(uint8_t wp, float a, float b, float alpha);
+extern bool gvf_ik_ellipse_XY(float x, float y, float a, float b, float alpha);
 
 // Sinusoidal
-extern bool gvf_sin_XY_alpha(float x, float y, float alpha, float w, float off, float A);
-extern bool gvf_sin_wp1_wp2(uint8_t wp1, uint8_t wp2, float w, float off,
+extern bool gvf_ik_sin_XY_alpha(float x, float y, float alpha, float w, float off, float A);
+extern bool gvf_ik_sin_wp1_wp2(uint8_t wp1, uint8_t wp2, float w, float off,
                             float A);
-extern bool gvf_sin_wp_alpha(uint8_t wp, float alpha, float w, float off,
+extern bool gvf_ik_sin_wp_alpha(uint8_t wp, float alpha, float w, float off,
                              float A);
 
 
-#endif // GVF_H
+#endif // GVF_IK_H

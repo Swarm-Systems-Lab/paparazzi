@@ -276,7 +276,13 @@
     <define name="JSBSIM_MODEL" value="easystar" type="string"/>
     <define name="SENSORS_PARAMS" value="nps_sensors_params_default.h" type="string"/>
   </section>
+  
+  <section name="GCS">
+    <define name="AC_ICON" value="flyingwing"/>
+  </section>
 
+  <!-- GNS sections ....................... -->
+  
   <section name="GVF" prefix="GVF_">
     <define name="ELLIPSE_KE" value="0.8"/>
     <define name="ELLIPSE_KN" value="0.6"/>
@@ -289,8 +295,7 @@
     <define name="GAMMA" value="0.7"/>
     <define name="OMEGA_THRESHOLD" value="-0.2"/>
   </section>
-
-  <section name="GCS">
-    <define name="AC_ICON" value="flyingwing"/>
-  </section>
+  
+  <!-- .................................... -->
+  
 </airframe>

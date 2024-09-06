@@ -53,7 +53,7 @@ This airframe is a template to autogenerate with multi_npssim.py the airframe fi
     </module>
 
     <!-- Guidance modules -->
-    <module name="gvf_module">
+    <module name="gvf_classic">
       <define name="OCAML_GCS" value="FALSE"/>
     </module>
     

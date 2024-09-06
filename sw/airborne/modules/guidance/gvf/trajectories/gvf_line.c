@@ -26,8 +26,6 @@
  *  2D straight line trajectory
  */
 
-
-#include "modules/nav/common_nav.h"
 #include "gvf_line.h"
 #include "generated/airframe.h"
 

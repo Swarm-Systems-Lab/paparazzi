@@ -26,8 +26,6 @@
  *  2D sinusoidal trajectory
  */
 
-
-#include "modules/nav/common_nav.h"
 #include "gvf_sin.h"
 #include "generated/airframe.h"
 

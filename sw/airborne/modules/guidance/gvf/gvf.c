@@ -24,7 +24,6 @@
 #include "std.h"
 
 #include "modules/guidance/gvf/gvf.h"
-#include "modules/guidance/gvf/gvf_low_level_control.h"
 #include "modules/guidance/gvf/trajectories/gvf_ellipse.h"
 #include "modules/guidance/gvf/trajectories/gvf_line.h"
 #include "modules/guidance/gvf/trajectories/gvf_sin.h"
@@ -33,19 +32,12 @@
 // Control
 gvf_con gvf_control;
 
-// State
-gvf_st gvf_state;
-
-// Trajectory
-gvf_tra gvf_trajectory;
-gvf_seg gvf_segment;
-
 // Time variables to check if GVF is active
-uint32_t gvf_t0 = 0;
+static uint32_t gvf_t0 = 0;
 
 // Param array lenght
-int gvf_plen = 1;
-int gvf_plen_wps = 0;
+static int gvf_plen = 1;
+static int gvf_plen_wps = 0;
 
 #if PERIODIC_TELEMETRY
 #include "modules/datalink/telemetry.h"
@@ -57,7 +49,7 @@ static void send_gvf(struct transport_tx *trans, struct link_device *dev)
   uint32_t delta_T = now - gvf_t0;
 
   if (delta_T < 200) {
-    pprz_msg_send_GVF(trans, dev, AC_ID, &gvf_control.error, &traj_type,
+    pprz_msg_send_GVF(trans, dev, AC_ID, &gvf_control.error, &gvf_control.error, &traj_type,
                       &gvf_control.s, &gvf_control.ke, gvf_plen, gvf_trajectory.p);
 
 #if GVF_OCAML_GCS

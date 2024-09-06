@@ -29,7 +29,7 @@
 #ifndef GVF_LINE_H
 #define GVF_LINE_H
 
-#include "modules/guidance/gvf/gvf.h"
+#include "modules/guidance/gvf/gvf_common.h"
 
 /** @typedef gvf_li_par
 * @brief Parameters for the GVF line trajectory

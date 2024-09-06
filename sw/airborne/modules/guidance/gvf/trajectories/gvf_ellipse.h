@@ -29,7 +29,7 @@
 #ifndef GVF_ELLIPSE_H
 #define GVF_ELLIPSE_H
 
-#include "modules/guidance/gvf/gvf.h"
+#include "modules/guidance/gvf/gvf_common.h"
 
 /** @typedef gvf_ell_par
 * @brief Parameters for the GVF line trajectory

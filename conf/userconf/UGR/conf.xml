@@ -7,7 +7,7 @@
    telemetry="telemetry/GVF/gvf_default_fixedwing.xml"
    flight_plan="flight_plans/UGR/fixedwing_clubalhambra_param.xml"
    settings="settings/fixedwing_basic.xml"
-   settings_modules="modules/ahrs_float_dcm.xml modules/cbf.xml~CBF~ modules/gps.xml modules/gps_ublox.xml modules/guidance_full_pid_fw.xml modules/gvf_module.xml~GVF~ modules/gvf_parametric.xml~GVF_PARAMETRIC~ modules/imu_common.xml modules/nav_basic_fw.xml modules/power_switch.xml modules/stabilization_adaptive_fw.xml"
+   settings_modules="modules/ahrs_float_dcm.xml modules/cbf.xml~CBF~ modules/gps.xml modules/gps_ublox.xml modules/guidance_full_pid_fw.xml modules/gvf_classic.xml~GVF~ modules/gvf_parametric.xml~GVF_PARAMETRIC~ modules/imu_common.xml modules/nav_basic_fw.xml modules/power_switch.xml modules/stabilization_adaptive_fw.xml"
    gui_color="blue"
   />
   <aircraft
@@ -18,7 +18,7 @@
    telemetry="telemetry/GVF/gvf_rover.xml"
    flight_plan="flight_plans/UGR/steering_rover_surveyRSSI.xml"
    settings=""
-   settings_modules="modules/ahrs_float_dcm.xml modules/cbf.xml~CBF~ modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_rover_steering.xml~SR Guidance~ modules/gvf_module.xml~GVF~ modules/imu_common.xml modules/nav_rover_base.xml"
+   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_rover_steering.xml~SR Guidance~ modules/gvf_classic.xml~GVF~ modules/imu_common.xml modules/nav_rover_base.xml"
    gui_color="#35008400e400"
   />
   <aircraft
@@ -29,7 +29,7 @@
    telemetry="telemetry/GVF/gvf_rover.xml"
    flight_plan="flight_plans/UGR/steering_rover_surveyRSSI.xml"
    settings=""
-   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_rover_steering.xml~SR Guidance~ modules/gvf_module.xml~GVF~ modules/imu_common.xml modules/nav_rover_base.xml"
+   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_rover_steering.xml~SR Guidance~ modules/gvf_classic.xml~GVF~ modules/imu_common.xml modules/nav_rover_base.xml"
    gui_color="#3300d1007a00"
   />
   <aircraft
@@ -40,7 +40,7 @@
    telemetry="telemetry/GVF/gvf_rover.xml"
    flight_plan="flight_plans/UGR/steering_rover_surveyRSSI.xml"
    settings=""
-   settings_modules="modules/ahrs_float_dcm.xml modules/cbf.xml~CBF~ modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_rover_steering.xml~SR Guidance~ modules/gvf_module.xml~GVF~ modules/imu_common.xml modules/nav_rover_base.xml"
+   settings_modules="modules/ahrs_float_dcm.xml modules/cbf.xml~CBF~ modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_rover_steering.xml~SR Guidance~ modules/gvf_classic.xml~GVF~ modules/imu_common.xml modules/nav_rover_base.xml"
    gui_color="#e0001b002400"
   />
   <aircraft
@@ -49,9 +49,9 @@
    airframe="airframes/UGR/sonic_n1.xml"
    radio="radios/UGR/T16SZ_SBUS_sonic.xml"
    telemetry="telemetry/UGR/gvf_fixedwing_sd.xml"
-   flight_plan="flight_plans/UGR/fixedwing_clubalhambra_param.xml"
+   flight_plan="flight_plans/UGR/fixedwing_clubalhambra_ik.xml"
    settings=""
-   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_full_pid_fw.xml modules/gvf_module.xml~GVF~ modules/imu_common.xml modules/logger_sd_chibios.xml modules/nav_basic_fw.xml modules/power_switch.xml modules/stabilization_adaptive_fw.xml"
+   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_full_pid_fw.xml modules/gvf_ik.xml~GVF~ modules/gvf_classic.xml~GVF~ modules/gvf_parametric.xml~GVF_PARAMETRIC~ modules/imu_common.xml modules/logger_sd_chibios.xml modules/nav_basic_fw.xml modules/power_switch.xml modules/stabilization_adaptive_fw.xml"
    gui_color="#6200a000ea00"
   />
   <aircraft
@@ -62,7 +62,7 @@
    telemetry="telemetry/GVF/gvf_default_fixedwing.xml"
    flight_plan="flight_plans/UGR/fixedwing_clubalhambra_param.xml"
    settings="settings/fixedwing_basic.xml"
-   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_full_pid_fw.xml modules/gvf_module.xml~GVF~ modules/gvf_parametric.xml~GVF_PARAMETRIC~ modules/imu_common.xml modules/logger_sd_chibios.xml modules/nav_basic_fw.xml modules/power_switch.xml modules/stabilization_adaptive_fw.xml"
+   settings_modules="modules/ahrs_float_dcm.xml modules/gps.xml modules/gps_ublox.xml modules/gps_ubx_ucenter.xml modules/guidance_full_pid_fw.xml modules/gvf_classic.xml~GVF~ modules/gvf_parametric.xml~GVF_PARAMETRIC~ modules/imu_common.xml modules/logger_sd_chibios.xml modules/nav_basic_fw.xml modules/power_switch.xml modules/stabilization_adaptive_fw.xml"
    gui_color="#ed0033003b00"
   />
   <aircraft
