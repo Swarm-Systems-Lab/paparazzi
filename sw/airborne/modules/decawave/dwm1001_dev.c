@@ -28,6 +28,7 @@
 
 #include "dwm1001_dev.h"
 #include "modules/datalink/telemetry.h"
+#include "modules/gps/gps.h"
 #include "modules/radio_control/radio_control.h"
 #include "state.h"
 #include "mcu_periph/uart.h"
@@ -112,9 +113,6 @@ static void send_dwm1001_debug(struct transport_tx *trans, struct link_device *d
 
 static void send_dwm1001_data(struct transport_tx *trans, struct link_device *dev)
 {
-  dwm1001_data.enu_xy[0] = stateGetPositionEnu_f()->x;
-  dwm1001_data.enu_xy[1] = stateGetPositionEnu_f()->y;
-
   pprz_msg_send_DWM1001_DATA(trans, dev, AC_ID, &dwm1001_data.sigma, 2, dwm1001_data.centroid_xy,
                              2, dwm1001_data.asc_dirc_xy, 2, dwm1001_data.enu_xy);
 }
@@ -280,8 +278,14 @@ void dwm1001_dev_periodic(void)
 
   } else { 
     // 2) Send (x,y) NED position
-    float p[2] = {stateGetPositionEnu_f()->x, stateGetPositionEnu_f()->y};
-    send_msg(DWM1001_MSG_NED_POS, 8, DWM1001_ENCODE(p));
+    dwm1001_data.enu_xy[0] = -1;
+    dwm1001_data.enu_xy[1] = -1;
+    if (GpsFixValid()) {
+      dwm1001_data.enu_xy[0] = stateGetPositionEnu_f()->x;
+      dwm1001_data.enu_xy[1] = stateGetPositionEnu_f()->y;
+    }
+
+    send_msg(DWM1001_MSG_NED_POS, 8, DWM1001_ENCODE(dwm1001_data.enu_xy));
 
   }
 
