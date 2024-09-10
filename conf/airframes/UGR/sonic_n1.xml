@@ -37,10 +37,10 @@
     <module name="telemetry" type="xbee_api"/>
 
     <!-- SD logging -->
-    <module name="tlsf"/>
+    <!--module name="tlsf"/>
     <module name="logger" type="sd_chibios"/>
     <module name="pprzlog"/>
-    <module name="flight_recorder"/>
+    <module name="flight_recorder"/-->
 
     <!-- IMU, AHRS, INS -->
     <module name="imu" type="apogee">
