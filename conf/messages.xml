@@ -629,6 +629,10 @@
       </description>
       <field name="phi" type="float">Value of the trajectory implicit equation</field>
       <field name="error" type="float">Error index</field>
+      <field name="n_norm" type="float">n_norm</field>
+      <field name="t_norm" type="float">t_norm</field>
+      <field name="omega_d" type="float">omega_d</field>
+      <field name="omega" type="float">omega</field>
       <field name="traj" type="uint8">Kind of trajectory</field>
       <field name="s" type="int8" values="1|-1">Direction to be followed</field>
       <field name="ke" type="float">Gain for the vector field convergence</field>
@@ -1770,7 +1774,6 @@
       <field name="kappa"       type="float"/>
     </message>
 
-    <!-- 186 is free -->
     <!-- 187 is free -->
     <!-- 188 is free -->
     <!-- 189 is free -->

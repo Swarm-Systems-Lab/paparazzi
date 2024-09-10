@@ -31,6 +31,7 @@
 
 // Control
 gvf_con gvf_control;
+gvf_tel gvf_telemetry;
 
 // Time variables to check if GVF is active
 static uint32_t gvf_t0 = 0;
@@ -49,8 +50,16 @@ static void send_gvf(struct transport_tx *trans, struct link_device *dev)
   uint32_t delta_T = now - gvf_t0;
 
   if (delta_T < 200) {
-    pprz_msg_send_GVF(trans, dev, AC_ID, &gvf_control.error, &gvf_control.error, &traj_type,
-                      &gvf_control.s, &gvf_control.ke, gvf_plen, gvf_trajectory.p);
+    pprz_msg_send_GVF(
+      trans, dev, AC_ID, 
+      &gvf_control.error, 
+      &gvf_control.error, 
+      &gvf_telemetry.n_norm,
+      &gvf_telemetry.t_norm,
+      &gvf_telemetry.omega_d,
+      &gvf_telemetry.omega,
+      &traj_type, &gvf_control.s, &gvf_control.ke, 
+      gvf_plen, gvf_trajectory.p);
 
 #if GVF_OCAML_GCS
     if (gvf_trajectory.type == ELLIPSE &&
@@ -174,6 +183,14 @@ void gvf_control_2D(float ke, float kn, float e,
 
   float omega = omega_d + kn * (mr_x * md_y - mr_y * md_x);
   
+  // Telemetry data
+  gvf_telemetry.n_norm = ke*e*sqrtf(nx*nx + ny*ny);
+  gvf_telemetry.t_norm = sqrtf(tx*tx + ty*ty);
+  gvf_telemetry.omega_d = omega_d;
+  gvf_telemetry.omega = omega;
+
+  // ---------------------------------------------------------------------------
+
   // Set GVF common info
   gvf_c_info.kappa   = (nx*(H12*ny - nx*H22) + ny*(H21*nx - H11*ny))/powf(nx*nx + ny*ny,1.5);
   gvf_c_info.ori_err = 1 - (md_x*cosf(course) + md_y*sinf(course));

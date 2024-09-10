@@ -36,6 +36,8 @@
 #include "std.h"
 #include "gvf_common.h"
 
+/** STRUCTS ---------------------------------------------------------------- **/
+
 /** @typedef gvf_con
 * @brief Control parameters for the GVF
 * @param ke Gain defining how agressive is the vector field
@@ -47,11 +49,20 @@ typedef struct {
   float ke;
   float kn;
   float error;
-  float omega;
   int8_t s;
 } gvf_con;
 
+typedef struct {
+  float n_norm;
+  float t_norm;
+  float omega_d;
+  float omega;
+} gvf_tel;
+
+// Extern structs
 extern gvf_con gvf_control;
+
+/** EXTERN FUNCTIONS ------------------------------------------------------- **/
 
 extern void gvf_init(void);
 void gvf_control_2D(float ke, float kn, float e,

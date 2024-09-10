@@ -8,7 +8,7 @@
   <waypoints>
     <waypoint name="HOME" alt="713" x="-0.648" y="-0.647"/>
     <waypoint name="STDBY" lat="37.29826926318695" lon="-3.683916936727701"/>
-    <waypoint name="ELLIPSE" lat="37.29826926318695" lon="-3.683916936727701"/>
+    <waypoint name="ELLIPSE" lat="37.2997200" lon="-3.6868681"/>
     <waypoint name="TREFOIL" lat="37.2987704" lon="-3.6844594"/>
     <waypoint name="CLIMB" alt="753" x="-77.375" y="-46.790"/>
     <waypoint name="AF" alt="730" x="-139.4" y="-55.5"/>

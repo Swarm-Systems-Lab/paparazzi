@@ -31,6 +31,7 @@
 
 // Control
 gvf_ik_con gvf_ik_control;
+gvf_ik_tel gvf_ik_telemetry;
 
 // Time variables to check if GVF is active
 static uint32_t fd_t0 = 0;
@@ -50,8 +51,16 @@ static void send_gvf(struct transport_tx *trans, struct link_device *dev)
   uint32_t delta_T = now - last_gvf_t0;
 
   if (delta_T < 200) {
-    pprz_msg_send_GVF(trans, dev, AC_ID, &gvf_ik_control.phi, &gvf_ik_control.error, &traj_type,
-                      &gvf_ik_control.s, &gvf_ik_control.ke, plen, gvf_trajectory.p);
+    pprz_msg_send_GVF(
+      trans, dev, AC_ID, 
+      &gvf_ik_control.phi, 
+      &gvf_ik_control.error, 
+      &gvf_ik_telemetry.n_norm,
+      &gvf_ik_telemetry.t_norm,
+      &gvf_ik_telemetry.omega_d,
+      &gvf_ik_telemetry.omega,
+      &traj_type, &gvf_ik_control.s, &gvf_ik_control.ke, 
+      plen, gvf_trajectory.p);
 
 #if GVF_OCAML_GCS
     if (gvf_trajectory.type == ELLIPSE &&
@@ -254,12 +263,18 @@ void gvf_ik_control_2D(float ke, float kn, float phi,
     pd_ddot_y = speed * (ny_dot / n_norm + (nx*ny*nx_dot + ny*ny*ny_dot) / n_norm3);
   }
   
-  float omega_d = (- pdx_dot*pd_ddot_y + pdy_dot*pd_ddot_x) / speed2;
+  float omega_d = - (- pdx_dot*pd_ddot_y + pdy_dot*pd_ddot_x) / speed2;
 
   float rx = speed * sinf(course);
   float ry = speed * cosf(course);
 
   float omega = omega_d - kn * (pdx_dot*ry - pdy_dot*rx) / speed2;
+
+  // Telemetry data
+  gvf_ik_telemetry.n_norm = n_norm;
+  gvf_ik_telemetry.t_norm = alpha;
+  gvf_ik_telemetry.omega_d = omega_d;
+  gvf_ik_telemetry.omega = omega;
 
   //printf("t: %f, pdx_dot: %f, pdy_dot: %f, rx: %f , ry: %f, omega: %f \n", t, pdx_dot, pdy_dot, rx, ry, omega);
   

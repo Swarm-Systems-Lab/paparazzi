@@ -38,6 +38,8 @@
 #include "std.h"
 #include "gvf_common.h"
 
+/** STRUCTS ---------------------------------------------------------------- **/
+
 /** @typedef gvf_con
 * @brief Control parameters for the GVF
 * @param ke Gain defining how agressive is the vector field
@@ -50,18 +52,26 @@ typedef struct {
   float kn;
   float phi;
   float error;
-  float omega;
   int8_t s;
 
   float fd_amplitude;
   float fd_omega;
 } gvf_ik_con;
 
+typedef struct {
+  float n_norm;
+  float t_norm;
+  float omega_d;
+  float omega;
+} gvf_ik_tel;
+
+// Extern structs
 extern gvf_ik_con gvf_ik_control;
 
+/** EXTERN FUNCTIONS ------------------------------------------------------- **/
+
 extern void gvf_ik_init(void);
-void gvf_ik_control_2D(float ke, float kn, float e,
-                    struct gvf_grad *, struct gvf_Hess *);
+void gvf_ik_control_2D(float ke, float kn, float e, struct gvf_grad *, struct gvf_Hess *);
 extern void gvf_ik_set_direction(int8_t s);
 
 // Straigh line
@@ -73,7 +83,6 @@ extern bool gvf_ik_segment_loop_wp1_wp2(uint8_t wp1, uint8_t wp2, float d1, floa
 extern bool gvf_ik_segment_XY1_XY2(float x1, float y1, float x2, float y2);
 extern bool gvf_ik_segment_wp1_wp2(uint8_t wp1, uint8_t wp2);
 extern bool gvf_ik_line_wp_heading(uint8_t wp, float heading);
-
 
 // Ellipse
 extern bool gvf_ik_ellipse_wp(uint8_t wp, float a, float b, float alpha);
