@@ -61,7 +61,7 @@
     </module>
 
     <!-- GNC -->
-    <!--module name="takeoff_detect"/-->
+    <module name="takeoff_detect"/>
     <module name="control" type="new"/>
     <module name="navigation"/>
     <!--module name="cbf">
