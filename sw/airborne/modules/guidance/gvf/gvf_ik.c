@@ -53,14 +53,16 @@ static void send_gvf(struct transport_tx *trans, struct link_device *dev)
   if (delta_T < 200) {
     pprz_msg_send_GVF(
       trans, dev, AC_ID, 
+      &gvf_ik_control.error,
+      &traj_type, 
+      &gvf_ik_control.s, 
+      &gvf_ik_control.ke, 
+      plen, gvf_trajectory.p,
       &gvf_ik_control.phi, 
-      &gvf_ik_control.error, 
       &gvf_ik_telemetry.n_norm,
       &gvf_ik_telemetry.t_norm,
       &gvf_ik_telemetry.omega_d,
-      &gvf_ik_telemetry.omega,
-      &traj_type, &gvf_ik_control.s, &gvf_ik_control.ke, 
-      plen, gvf_trajectory.p);
+      &gvf_ik_telemetry.omega);
 
 #if GVF_OCAML_GCS
     if (gvf_trajectory.type == ELLIPSE &&
