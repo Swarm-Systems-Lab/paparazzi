@@ -136,5 +136,6 @@ extern gvf_seg gvf_segment;
 extern void gvf_low_level_getState(void);
 extern void gvf_low_level_control_2D(float omega);
 extern bool gvf_nav_approaching(float wp_x, float wp_y, float from_x, float from_y, float t);
+extern bool gvf_nav_closeto_WP(uint8_t wp, float min_dist);
 
 #endif // GVF_COMMON_H

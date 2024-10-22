@@ -99,7 +99,7 @@ void gvf_low_level_control_2D(float omega)
 bool gvf_nav_approaching(float wp_x, float wp_y, float from_x, float from_y, float t) 
 {
 
-  #if defined(FIXEDWING_FIRMWARE) 
+  #if defined(FIXEDWING_FIRMWARE)
   return nav_approaching_xy(wp_x, wp_y, from_x, from_y, t);
 
   #elif defined(ROVER_FIRMWARE)
@@ -113,3 +113,30 @@ bool gvf_nav_approaching(float wp_x, float wp_y, float from_x, float from_y, flo
   return nav.nav_approaching(&wp, &from, t);
   #endif
 }
+
+bool gvf_nav_closeto_WP(uint8_t wp, float min_dist) 
+{
+  float wp_x = WaypointX(wp);
+  float wp_y = WaypointY(wp);
+
+  gvf_low_level_getState();
+  float pw_x = wp_x - stateGetPositionEnu_f()->x;
+  float pw_y = wp_y - stateGetPositionEnu_f()->y;
+
+  float dist2_to_wp = pw_x * pw_x + pw_y * pw_y;
+  printf("disttowp2: %f, min_dist2:%f, %d",dist2_to_wp, min_dist*min_dist, dist2_to_wp < min_dist * min_dist);
+  return dist2_to_wp < min_dist * min_dist;
+}
+
+// bool gvf_segment_loop_wp1_wp2(uint8_t wp1, uint8_t wp2, float d1, float d2)
+// { 
+//   gvf_trajectory.p[3] = wp1;
+//   gvf_trajectory.p[4] = wp2;
+//   gvf_trajectory.p[5] = d1;
+//   gvf_trajectory.p[6] = d2;
+//   gvf_plen_wps = 4;
+
+//   float x1 = WaypointX(wp1);
+//   float y1 = WaypointY(wp1);
+//   float x2 = WaypointX(wp2);
+//   float y2 = WaypointY(wp2);

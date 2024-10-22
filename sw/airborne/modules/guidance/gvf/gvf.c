@@ -57,6 +57,7 @@ static void send_gvf(struct transport_tx *trans, struct link_device *dev)
       &gvf_control.s, 
       &gvf_control.ke, 
       gvf_plen, gvf_trajectory.p,
+      &gvf_control.error_n,
       &gvf_control.error, 
       &gvf_telemetry.n_norm,
       &gvf_telemetry.t_norm,
@@ -183,20 +184,24 @@ void gvf_control_2D(float ke, float kn, float e,
   float mr_x = sinf(course);
   float mr_y = cosf(course);
 
-  float omega = omega_d + kn * (mr_x * md_y - mr_y * md_x);
+  float e_n = (mr_x * md_y - mr_y * md_x);
+  float omega = omega_d + kn * e_n;
   
+  gvf_control.error_n = e_n;
+
+  // ---------------------------------------------------------------------------
+
   // Telemetry data
   gvf_telemetry.n_norm = ke*e*sqrtf(nx*nx + ny*ny);
   gvf_telemetry.t_norm = sqrtf(tx*tx + ty*ty);
   gvf_telemetry.omega_d = omega_d;
   gvf_telemetry.omega = omega;
 
-  // ---------------------------------------------------------------------------
-
   // Set GVF common info
   gvf_c_info.kappa   = (nx*(H12*ny - nx*H22) + ny*(H21*nx - H11*ny))/powf(nx*nx + ny*ny,1.5);
   gvf_c_info.ori_err = 1 - (md_x*cosf(course) + md_y*sinf(course));
 
+  // Call the low level control
   gvf_low_level_control_2D(omega);
 }
 

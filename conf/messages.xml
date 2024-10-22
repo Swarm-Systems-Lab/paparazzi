@@ -632,6 +632,7 @@
       <field name="s" type="int8" values="1|-1">Direction to be followed</field>
       <field name="ke" type="float">Gain for the vector field convergence</field>
       <field name="p" type="float[]">Parameters describing the trajectory</field>
+      <field name="error_n" type="float">Error of alignment</field>
       <field name="phi" type="float">Value of the trajectory implicit equation</field>
       <field name="n_norm" type="float">n_norm</field>
       <field name="t_norm" type="float">t_norm</field>

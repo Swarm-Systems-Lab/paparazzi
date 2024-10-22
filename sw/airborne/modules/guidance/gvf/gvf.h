@@ -43,12 +43,15 @@
 * @param ke Gain defining how agressive is the vector field
 * @param kn Gain for making converge the vehile to the vector field
 * @param error Error signal. It does not have any specific units. It depends on how the trajectory has been implemented. Check the specific wiki entry for each trajectory.
+* @param error_n Error of alignment with the GVF
 * @param s Defines the direction to be tracked. Its meaning depends on the trajectory and its implementation. Check the wiki entry of the GVF. It takes the values -1 or 1.
 */
+
 typedef struct {
   float ke;
   float kn;
   float error;
+  float error_n;
   int8_t s;
 } gvf_con;
 
