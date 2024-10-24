@@ -106,6 +106,7 @@ class SSFrame(wx.Frame):
         ax.axhline(0, c="k", ls="-", lw=1.1)
         ax.axvline(0, c="k", ls="-", lw=1.1)
         ax.set_box_aspect(1)
+        ax.margins(0.25, 0.25)
         
         data = self.ssapp.to_np_arrays()
         
